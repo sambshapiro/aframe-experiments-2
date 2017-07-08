@@ -1,11 +1,5 @@
 {
   "name": "networked-aframe",
-  "version": "0.2.0",
-  "description": "A web framework for building multi-user virtual reality experiences.",
-  "homepage": "",
-  "main": "dist/networked-aframe.js",
-  "author": "Hayden Lee <haydenjameslee@gmail.com>",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/haydenjameslee/networked-aframe/issues"
   },
@@ -24,7 +18,7 @@
     "test:chrome": "karma start ./tests/unit/karma.conf.js --browsers Chrome",
     "watch": "watchify src/index.js -o server/static/dev/build.js -v"
   },
-  "repository": "haydenjameslee/networked-aframe",
+  "repository": "sambshapiro/aframe-experiments-2",
   "dependencies": {
     "easyrtc": "1.1.0",
     "express": "^4.10.7",
