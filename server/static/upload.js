@@ -31,7 +31,7 @@ function mediaLoader() {
         NAF.connection.broadcastData('avatar', image.src);
         //document.getElementById("avatar-image").src = image.src;
         //$("#avatar-image").attr('src', 'url(' + image.src + ')');
-        document.querySelector('a-scene').querySelector('.avatar-image-class').setAttribute('material', 'src: url(' + image.src + ')');
+        document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', 'src', 'url(' + image.src + ')');
       }
     }
     $('#media_input_div').hide();
