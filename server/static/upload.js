@@ -18,9 +18,24 @@ function mediaLoader() {
     filetype = files[i].type;
   }
 
-  reader.onload = function() { //when reader load->
+  reader.onload = function() {
 
-    if (filetype.includes('image')){
+    if (filetype == 'image/gif') {
+
+      var image = new Image();
+
+      image.src = reader.result;
+
+      image.onload = function() { //IMAGE HAS BEEN LOADED
+        console.log("broadcasting data");
+        NAF.connection.broadcastData('avatar', image.src);
+        //document.getElementById("avatar-image").src = image.src;
+        //$("#avatar-image").attr('src', 'url(' + image.src + ')');
+        document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', {src: 'url(' + image.src + ')', shader: "gif"});
+      }
+    }
+
+    else if (filetype.includes('image')){
 
       var image = new Image();
 
