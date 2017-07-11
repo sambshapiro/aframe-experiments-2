@@ -20,6 +20,9 @@ function mediaLoader() {
 
   reader.onload = function() {
 
+    console.log("file type " + filetype);
+    console.log("FILE " + file);
+
     if (filetype == 'image/gif') {
 
       var image = new Image();
@@ -49,6 +52,12 @@ function mediaLoader() {
         document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', 'src', 'url(' + image.src + ')');
       }
     }
+
+    else {
+
+
+    }
+
     $('#media_input_div').hide();
 
   }
