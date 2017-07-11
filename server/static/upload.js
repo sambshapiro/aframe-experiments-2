@@ -35,6 +35,8 @@ function mediaLoader() {
         //$("#avatar-image").attr('src', 'url(' + image.src + ')');
         document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', {src: 'url(' + image.src + ')', shader: "gif"});
       }
+
+      document.querySelector('#avatar-hud').setAttribute('material', {src: 'url(' + image.src + ')', shader: "gif"});
     }
 
     else if (filetype.includes('image')){
