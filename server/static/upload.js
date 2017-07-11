@@ -10,13 +10,12 @@ $(document).ready(function(){
 var reader = new FileReader();
 
 function mediaLoader() {
-  //Get the files from the input
-  var files = document.getElementById("media_input").files;
+  //var files = document.getElementById("media_input").files;
   var file = document.getElementById("media_input").files[0];
-  var filetype;
-  for (var i = 0; i < files.length; i++) {
+  var filetype = file.type;
+  /*for (var i = 0; i < files.length; i++) {
     filetype = files[i].type;
-  }
+  }*/
 
   reader.onload = function() {
 
@@ -51,6 +50,9 @@ function mediaLoader() {
         //$("#avatar-image").attr('src', 'url(' + image.src + ')');
         document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', 'src', 'url(' + image.src + ')');
       }
+
+      document.querySelector('#avatar-hud').setAttribute('src', 'url(' + image.src + ')');
+      //var preview = document.createElement()
     }
 
     else {
