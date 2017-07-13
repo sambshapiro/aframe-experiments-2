@@ -61,7 +61,7 @@ function mediaLoader() {
           type: 'POST',
           data: JSON.stringify(data),
           contentType: 'application/json',
-          url: 'http://localhost:8080/imageUpload',
+          url: window.location.href + 'imageUpload',
           success: function(data) {
             console.log('success');
             console.log(JSON.stringify(data));
