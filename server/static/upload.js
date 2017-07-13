@@ -55,7 +55,7 @@ function mediaLoader() {
 
         var data = { src: currentImageSrc, position: setPosition, rotation: setRotation };
         console.log("broadcasting data");
-        //NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));
+        NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));
 
         $.ajax({
           type: 'POST',

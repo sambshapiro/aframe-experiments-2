@@ -55,8 +55,8 @@
 
       NAF.connection.subscribeToDataChannel('imagePlaced', avatarCallback);
       function avatarCallback(senderRtcId, dataType, data) {
-        console.log(senderRtcId, dataType, data);
-        var image = JSON.parse(JSON.stringify(data));
+        console.log("DATA RECEIVED", senderRtcId, dataType, data);
+        var image = JSON.parse(data);
         addImageToScene(image.src, image.position, image.rotation);
       };
     </script>
