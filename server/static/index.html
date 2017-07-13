@@ -148,7 +148,7 @@
     //var images = {};
     $.ajax({
       dataType: 'json',
-      url: 'http://localhost:8080/retrieveImages',
+      url: window.location.href + 'retrieveImages',
       success: function(data) {
         console.log('success');
         var images = JSON.parse(JSON.stringify(data));
