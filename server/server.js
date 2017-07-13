@@ -1,4 +1,4 @@
-// Load required modules
+image// Load required modules
 var http    = require("http");              // http server core module
 var express = require("express");           // web framework external module
 var serveStatic = require('serve-static');  // serve static files
@@ -99,10 +99,10 @@ conn.once("open", function(){
     position: mongoose.Schema.Types.Mixed,
     rotation: mongoose.Schema.Types.Mixed
   });
-  var imageModel = mongoose.model('imageModel', imagesSchema);
+  var image = mongoose.model('image', imagesSchema);
 
   app.post("/imageUpload", function(req, res){
-    var newImage = new imageModel({ src: req.body.src, position: req.body.position, rotation: req.body.rotation });
+    var newImage = new image({ src: req.body.src, position: req.body.position, rotation: req.body.rotation });
     newImage.save(function (err, newImage) {
       if (err) return console.error(err);
       console.log("image successfully added to database");
@@ -111,7 +111,7 @@ conn.once("open", function(){
   });
 
   app.get("/retrieveImages", function(req, res){
-    imageModel.find(function (err, images) {
+    image.find(function (err, images) {
       if (err) return console.error(err);
       console.log(images);
       res.send(JSON.stringify(images));
