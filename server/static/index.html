@@ -43,15 +43,27 @@
       };
       NAF.schemas.add(avatarSchema);
 
-      NAF.connection.subscribeToDataChannel('avatar', avatarCallback);
+      function addImageToScene(src, position, rotation) {
+        var containerEl = document.createElement('a-entity');
+        var entityEl = document.createElement('a-image');
+        containerEl.appendChild(entityEl);
+        document.querySelector('a-scene').appendChild(containerEl);
+        entityEl.setAttribute('visible','true');
+        entityEl.setAttribute('position',position);
+        entityEl.setAttribute('rotation',rotation);
+        entityEl.setAttribute('material', 'src', 'url(' + src + ')');
+      }
+
+      NAF.connection.subscribeToDataChannel('imagePlaced', avatarCallback);
       function avatarCallback(senderRtcId, dataType, data) {
         console.log(senderRtcId, dataType, data);
-
+        var image = JSON.parse(JSON.stringify(data));
+        addImageToScene(image.src, image.position, image.rotation);
       };
     </script>
   </head>
   <body>
-    <input type="file" class="upload" name="avatar" id="media_input" multiple>
+    <input type="file" class="upload" name="avatar" id="media_input" single>
     <a-scene networked-scene="
       room: basic;
       debug: true;
@@ -130,6 +142,25 @@
         var particles = document.getElementById('particles');
         particles.parentNode.removeChild(particles);
       }
+    </script>
+
+    <script>
+    //Add all images from database into the scene
+    //var images = {};
+    $.ajax({
+      dataType: 'json',
+      url: 'http://localhost:8080/retrieveImages',
+      success: function(data) {
+        console.log('success');
+        var images = JSON.parse(JSON.stringify(data));
+        console.log("numImages = " + images.length);
+        for (var i = 0; i < images.length; i++) {
+          console.log("image " + i);
+          addImageToScene(images[i].src, images[i].position, images[i].rotation);
+        }
+      }
+    });
+
     </script>
   </body>
 </html>
