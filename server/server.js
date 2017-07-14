@@ -15,7 +15,9 @@ var fs = require("fs");
 var mongoose = require("mongoose");
 mongoose.connect(mLab);
 var conn = mongoose.connection;
-bodyParser = require('body-parser');
+var bodyParser = require('body-parser');
+var shortid = require('shortid');
+shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
 
 // Set process name
 process.title = "node-easyrtc";
@@ -101,6 +103,13 @@ conn.once("open", function(){
   });
   var image = mongoose.model('image', imagesSchema);
 
+  var locationSchema = mongoose.Schema({
+    id: String,
+    position: mongoose.Schema.Types.Mixed,
+    rotation: mongoose.Schema.Types.Mixed
+  });
+  var location = mongoose.model('location', locationSchema);
+
   app.post("/imageUpload", function(req, res){
     var newImage = new image({ src: req.body.src, position: req.body.position, rotation: req.body.rotation });
     newImage.save(function (err, newImage) {
@@ -117,6 +126,33 @@ conn.once("open", function(){
       res.send(JSON.stringify(images));
     });
 
+  });
+
+  app.post("/savePosition", function(req, res){
+    var newId = shortid.generate();
+    var savedLocation = new location({ id: newId, position: req.body.position, rotation: req.body.rotation });
+    savedLocation.save(function (err, savedLocation) {
+      if (err) return console.error(err);
+      console.log("location successfully added to database");
+      res.send(newId);
+    });
+  });
+
+  app.get("/loc/:shortid", function(req, res){
+    //if(err) return res.send("No location found");
+    console.log("shortid is " + req.params.shortid);
+    location.findOne({ 'id' : req.params.shortid }, function (err, location) {
+      if (err) return console.error(err);
+      console.log("location.position " + JSON.stringify(location.position));
+      console.log("location.rotation " + JSON.stringify(location.rotation));
+      res.redirect(
+        '/?specLocX=' + location.position.x +
+        '&specLocY=' + location.position.y +
+        '&specLocZ=' + location.position.z +
+        '/?specRotX=' + location.rotation.x +
+        '&specRotY=' + location.rotation.y +
+        '&specRotZ=' + location.rotation.z);
+    });
   });
 
 
