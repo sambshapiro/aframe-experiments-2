@@ -12,7 +12,7 @@ function savePosition() {
     url: location.protocol + '//' + location.host + location.pathname + 'savePosition',
     success: function(data) {
       console.log('successfully sent position to server.');
-      $("<p>come back to this exact position: " + window.location.href + 'loc/' + data + "</p>").insertAfter(document.getElementById("savelocationbutton"));
+      $("<p>come back to this exact position: " + location.protocol + '//' + location.host + location.pathname + 'loc/' + data + "</p>").insertAfter(document.getElementById("savelocationbutton"));
     }
   });
 
