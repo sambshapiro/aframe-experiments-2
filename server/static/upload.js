@@ -61,10 +61,9 @@ function mediaLoader() {
           type: 'POST',
           data: JSON.stringify(data),
           contentType: 'application/json',
-          url: window.location.href + 'imageUpload',
+          url: location.protocol + '//' + location.host + location.pathname + 'imageUpload',
           success: function(data) {
             console.log('success');
-            console.log(JSON.stringify(data));
           }
         });
         //dbcollection_images.insert([newImage]);
