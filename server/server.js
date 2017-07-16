@@ -6,8 +6,8 @@ var socketIo = require("socket.io");        // web socket external module
 var easyrtc = require("easyrtc");           // EasyRTC external module
 
 //var mongodb = require('mongodb');
-var config = require('../server/config');
-var mLab = 'mongodb://' + config.db.host + '/' + config.db.name;
+//var config = require('../server/config');
+var mLab = 'mongodb://' + process.env.CONFIGDBHOST + '/' + process.env.CONFIGDBNAME;
 //var MongoClient = mongodb.MongoClient;
 //var collection;
 
