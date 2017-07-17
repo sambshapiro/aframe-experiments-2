@@ -14,10 +14,12 @@ function uploadMedia() {
 }
 
 function mediaLoader() {
-  if (document.getElementById("appendedUrl").value != "") {
-    console.log("url saved " + document.getElementById("appendedUrl").value);
-    var url = document.getElementById("appendedUrl").value;
-  }
+  var url = document.getElementById("appendedUrl").value;
+  document.getElementById("appendedUrl").value = "";
+  var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
+  var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
+  var setPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y, currentPosition.z+1);
+  var setRotation = currentRotation;
 
   $("#url_input_div").hide();
   //var files = document.getElementById("media_input").files;
@@ -40,14 +42,9 @@ function mediaLoader() {
     }
 
     else if (filetype.includes('image')){
-      var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
-      var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
-      var setPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y, currentPosition.z+1);
-      var setRotation = currentRotation;
+      addImageToScene(reader.result, setPosition, setRotation, url);
 
-      addImageToScene(reader.result, setPosition, setRotation);
-
-      var data = { src: reader.result, position: setPosition, rotation: setRotation };
+      var data = { src: reader.result, position: setPosition, rotation: setRotation, url: url };
       console.log("broadcasting data");
       NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));
 
@@ -67,7 +64,6 @@ function mediaLoader() {
 
     }
 
-    document.getElementById("media_input").reset();
 
   }
   if (file) {

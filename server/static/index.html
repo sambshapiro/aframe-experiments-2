@@ -48,7 +48,41 @@
   };
   NAF.schemas.add(avatarSchema);
 
-  function addImageToScene(src, position, rotation) {
+  AFRAME.registerComponent('url', {
+    schema: {
+      url: {default: ""},
+      movedAway: {default: true}
+    },
+    tick: function (time, timeDelta) {
+      var playerPos = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
+      if (
+        playerPos.x < (this.el.getAttribute('position').x + .5) &&
+        playerPos.x > (this.el.getAttribute('position').x - .5) &&
+        playerPos.z < (this.el.getAttribute('position').z + .5) &&
+        playerPos.z > (this.el.getAttribute('position').z - .5) &&
+        this.el.getAttribute('url').movedAway
+      ) {
+        console.log("PASSED THROUGH IMAGE");
+        window.open(this.el.getAttribute('url').url);
+        this.el.setAttribute('url', 'movedAway', 'false');
+        console.log("moved away: " + this.el.getAttribute('url').movedAway);
+      }
+      if (!this.el.getAttribute('url').movedAway) {
+        if (
+          playerPos.x > (this.el.getAttribute('position').x + 2) ||
+          playerPos.x < (this.el.getAttribute('position').x - 2) ||
+          playerPos.z > (this.el.getAttribute('position').z + 2) ||
+          playerPos.z < (this.el.getAttribute('position').z - 2)
+        )
+        {
+          console.log("MOVED AWAY FROM IMAGE");
+          this.el.setAttribute('url', 'movedAway', 'true');
+        }
+      }
+    }
+  });
+
+  function addImageToScene(src, position, rotation, url) {
     var containerEl = document.createElement('a-entity');
     var entityEl = document.createElement('a-image');
     containerEl.appendChild(entityEl);
@@ -57,13 +91,14 @@
     entityEl.setAttribute('position',position);
     entityEl.setAttribute('rotation',rotation);
     entityEl.setAttribute('material', 'src', 'url(' + src + ')');
+    entityEl.setAttribute('url', 'url', url);
   }
 
   NAF.connection.subscribeToDataChannel('imagePlaced', avatarCallback);
   function avatarCallback(senderRtcId, dataType, data) {
     console.log("DATA RECEIVED", senderRtcId, dataType, data);
     var image = JSON.parse(data);
-    addImageToScene(image.src, image.position, image.rotation);
+    addImageToScene(image.src, image.position, image.rotation, image.url);
   };
   </script>
 </head>
@@ -201,7 +236,7 @@ $.ajax({
     console.log("numImages = " + images.length);
     for (var i = 0; i < images.length; i++) {
       console.log("image " + i);
-      addImageToScene(images[i].src, images[i].position, images[i].rotation);
+      addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].url);
     }
   }
 });
