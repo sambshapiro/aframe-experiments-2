@@ -192,19 +192,19 @@ if (isMobile) {
 <script>
 //Add all images from database into the scene
 //var images = {};
-/*$.ajax({
-dataType: 'json',
-url: location.protocol + '//' + location.host + location.pathname + 'retrieveImages',
-success: function(data) {
-console.log('success');
-var images = JSON.parse(JSON.stringify(data));
-console.log("numImages = " + images.length);
-for (var i = 0; i < images.length; i++) {
-console.log("image " + i);
-addImageToScene(images[i].src, images[i].position, images[i].rotation);
-}
-}
-});*/
+$.ajax({
+  dataType: 'json',
+  url: location.protocol + '//' + location.host + location.pathname + 'retrieveImages',
+  success: function(data) {
+    console.log('success');
+    var images = JSON.parse(JSON.stringify(data));
+    console.log("numImages = " + images.length);
+    for (var i = 0; i < images.length; i++) {
+      console.log("image " + i);
+      addImageToScene(images[i].src, images[i].position, images[i].rotation);
+    }
+  }
+});
 function getUrlParameter(name) {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
   var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
