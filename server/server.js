@@ -99,7 +99,8 @@ conn.once("open", function(){
   var imagesSchema = mongoose.Schema({
     src: String,
     position: mongoose.Schema.Types.Mixed,
-    rotation: mongoose.Schema.Types.Mixed
+    rotation: mongoose.Schema.Types.Mixed,
+    url: String
   });
   var image = mongoose.model('image', imagesSchema);
 
@@ -111,7 +112,7 @@ conn.once("open", function(){
   var location = mongoose.model('location', locationSchema);
 
   app.post("/imageUpload", function(req, res){
-    var newImage = new image({ src: req.body.src, position: req.body.position, rotation: req.body.rotation });
+    var newImage = new image({ src: req.body.src, position: req.body.position, rotation: req.body.rotation, url: req.body.url });
     newImage.save(function (err, newImage) {
       if (err) return console.error(err);
       console.log("image successfully added to database");
