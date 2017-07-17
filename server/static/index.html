@@ -3,6 +3,7 @@
   <meta charset="utf-8">
   <title>Adventure Corp</title>
   <meta name="description" content="Networked-Aframe">
+  <link href="css/style.css" rel="stylesheet" type="text/css" media="screen" />
 
   <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
@@ -23,7 +24,10 @@
   src="https://code.jquery.com/jquery-3.2.1.min.js"
   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
   crossorigin="anonymous"></script>
-  <script src="upload.js"></script>
+
+  <script src="js/menu-ui.js"></script>
+  <script src="js/uploadAvatar.js"></script>
+  <script src="js/uploadMedia.js"></script>
 
   <script>
   // Define custom schema for syncing avatar color, set by random-color
@@ -64,47 +68,76 @@
   </script>
 </head>
 <body>
-  <input type="file" class="upload" name="avatar" id="media_input" single>
-  <button id="savelocationbutton" onclick="savePosition()">Save Location</button>
-  <a-scene networked-scene="
-  room: basic;
-  debug: true;
-  ">
-  <a-assets>
 
-    <img id="grid" src="https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png" crossorigin="anonymous">
-    <img id="sky" src="images/underwater.jpg" crossorigin="anonymous" />
-    <!--<a-asset-item id="spongebob-obj" src="/models/spongebob/model.obj"></a-asset-item>
-    <a-asset-item id="spongebob-mtl" src="/models/spongebob/materials.mtl"></a-asset-item>-->
+  <img id="avatar-hud" src="images/gradient.png" />
 
-    <!-- Avatar -->
-    <script id="avatar-template" type="text/html">
-      <a-entity class="avatar">
-        <a-image class="avatar-image-class" material="src: url(images/gradient.png)" scale="5 5 5" position="2 2 2">
-        </a-image>
-        <!--<a-entity obj-model="obj: #spongebob-obj; mtl: #spongebob-mtl"></a-entity>-->
-        <a-sphere class="head"
-        color="#5985ff"
-        scale="0.45 0.5 0.4"
-        random-color
-        ></a-sphere>
-        <a-entity class="face"
-        position="0 0.05 0"
-        >
-        <a-sphere class="eye"
-        color="#efefef"
-        position="0.16 0.1 -0.35"
-        scale="0.12 0.12 0.12"
-        >
-        <a-sphere class="pupil"
-        color="#000"
-        position="0 0 -1"
-        scale="0.2 0.2 0.2"
-        ></a-sphere>
-      </a-sphere>
+  <div id="url_input_div">
+    <p class="p_input" id="media_input_p"></p>
+    <input type="text" placeholder="Enter URL Here" class="url_btns" id="appendedUrl" name="URL" required/>
+    <button class="url_btns" onclick="mediaLoader()">Submit</button>
+
+    <button class="url_btns" onClick="mediaLoader()">No Thanks</button>
+  </div>
+
+  <div id="menu_div">
+
+    <!--<button name="Expand" class="menu_btn" id="expand_btn">
+    <img class="menu_icon" src="ui/icons/expand.png">
+  </button>
+
+  <button name="Collapse" class="menu_btn exp" id="collapse_btn">
+  <img class="menu_icon" src="ui/icons/collapse.png">
+</button>-->
+
+<button name="Save Location" class="menu_btn exp" id="savelocationbutton" onclick="savePosition()">
+  <img class="menu_icon" src="ui/icons/location.png" style="filter: invert(100%);">
+</button>
+
+<input type="file" class="upload" id="media_input" style="display:none" single>
+<button name="Add Media" class="menu_btn exp" id="addmedia_btn" onClick="uploadMedia()">
+  <img class="menu_icon" src="ui/icons/addmedia.png">
+</button>
+
+<input type="file" class="upload" id="avatar_input" style="display:none" single>
+<button name="Upload Avatar" class="menu_btn exp" id="avatar_menu_btn" onClick="uploadAvatar()">
+  <img class="menu_icon" src="ui/icons/addavatar.png">
+</button>
+
+<button name="VR Mode" class="menu_btn" id="enter_vr">
+  <img class="menu_icon" src="ui/icons/cardboard.png">
+</button>
+
+</div>
+
+
+<a-scene networked-scene="
+room: basic;
+debug: true;
+" vr-mode-ui="enabled: false">
+<a-assets>
+
+  <img id="grid" src="https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png" crossorigin="anonymous">
+  <img id="sky" src="images/underwater.jpg" crossorigin="anonymous" />
+  <!--<a-asset-item id="spongebob-obj" src="/models/spongebob/model.obj"></a-asset-item>
+  <a-asset-item id="spongebob-mtl" src="/models/spongebob/materials.mtl"></a-asset-item>-->
+
+  <!-- Avatar -->
+  <script id="avatar-template" type="text/html">
+    <a-entity class="avatar">
+      <a-image class="avatar-image-class" material="src: url(images/gradient.png)" scale="5 5 5" position="2 2 2">
+      </a-image>
+      <!--<a-entity obj-model="obj: #spongebob-obj; mtl: #spongebob-mtl"></a-entity>-->
+      <a-sphere class="head"
+      color="#5985ff"
+      scale="0.45 0.5 0.4"
+      random-color
+      ></a-sphere>
+      <a-entity class="face"
+      position="0 0.05 0"
+      >
       <a-sphere class="eye"
       color="#efefef"
-      position="-0.16 0.1 -0.35"
+      position="0.16 0.1 -0.35"
       scale="0.12 0.12 0.12"
       >
       <a-sphere class="pupil"
@@ -113,7 +146,18 @@
       scale="0.2 0.2 0.2"
       ></a-sphere>
     </a-sphere>
-  </a-entity>
+    <a-sphere class="eye"
+    color="#efefef"
+    position="-0.16 0.1 -0.35"
+    scale="0.12 0.12 0.12"
+    >
+    <a-sphere class="pupil"
+    color="#000"
+    position="0 0 -1"
+    scale="0.2 0.2 0.2"
+    ></a-sphere>
+  </a-sphere>
+</a-entity>
 </a-entity>
 </script>
 
@@ -121,8 +165,6 @@
 </a-assets>
 
 <a-entity id="player" networked="template:#avatar-template;showLocalTemplate:false;" camera spawn-in-circle="radius:3;" position="0 1.3 0" wasd-controls look-controls>
-  <a-image id="avatar-hud" material="src: url(images/gradient.png)" scale=".3 .3 .3" position="1.3 -.4 -1">
-  </a-image>
 </a-entity>
 
 <a-entity position="0 0 0"
@@ -150,19 +192,19 @@ if (isMobile) {
 <script>
 //Add all images from database into the scene
 //var images = {};
-$.ajax({
-  dataType: 'json',
-  url: location.protocol + '//' + location.host + location.pathname + 'retrieveImages',
-  success: function(data) {
-    console.log('success');
-    var images = JSON.parse(JSON.stringify(data));
-    console.log("numImages = " + images.length);
-    for (var i = 0; i < images.length; i++) {
-      console.log("image " + i);
-      addImageToScene(images[i].src, images[i].position, images[i].rotation);
-    }
-  }
-});
+/*$.ajax({
+dataType: 'json',
+url: location.protocol + '//' + location.host + location.pathname + 'retrieveImages',
+success: function(data) {
+console.log('success');
+var images = JSON.parse(JSON.stringify(data));
+console.log("numImages = " + images.length);
+for (var i = 0; i < images.length; i++) {
+console.log("image " + i);
+addImageToScene(images[i].src, images[i].position, images[i].rotation);
+}
+}
+});*/
 function getUrlParameter(name) {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
   var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
