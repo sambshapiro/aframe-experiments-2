@@ -52,7 +52,7 @@ function mediaLoader() {
         type: 'POST',
         data: JSON.stringify(data),
         contentType: 'application/json',
-        url: location.protocol + '//' + location.host + location.pathname + 'imageUpload',
+        url: location.protocol + '//' + location.host + location.pathname + '/imageUpload',
         success: function(data) {
           console.log('success');
         }

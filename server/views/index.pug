@@ -1,0 +1,139 @@
+html
+  head
+    meta(charset='utf-8')
+    title Adventure Corp
+    meta(name='description', content='Networked-Aframe')
+    link(href='/css/style.css', rel='stylesheet', type='text/css', media='screen')
+    script(src='https://code.jquery.com/jquery-3.2.1.min.js', integrity='sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=', crossorigin='anonymous')
+    script(src='https://aframe.io/releases/0.5.0/aframe.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js')
+    script(src='https://rawgit.com/mayognaise/aframe-gif-shader/master/dist/aframe-gif-shader.min.js')
+    script(src='https://rawgit.com/mayognaise/aframe-gif-component/master/dist/aframe-gif-component.min.js')
+    script(src='/js/loadSceneContent.js')
+    script(src='/easyrtc/easyrtc.js')
+    script(src='https://unpkg.com/networked-aframe/dist/networked-aframe.min.js')
+    script(src='https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js')
+    script(src='https://unpkg.com/aframe-particle-system-component@1.0.5/dist/aframe-particle-system-component.min.js')
+    script(src='/js/spawn-in-circle.component.js')
+    script(src='/js/url-component.js')
+    script(src='/js/savePosition.js')
+    script(src='/js/menu-ui.js')
+    script(src='/js/uploadAvatar.js')
+    script(src='/js/uploadMedia.js')
+    script.
+      console.log("pug template, room is #{roomToJoin}")
+      var specLocX = #{specLocX};
+      var specLocY = #{specLocY};
+      var specLocZ = #{specLocZ};
+      var specRotX = #{specRotX};
+      var specRotY = #{specRotY};
+      var specRotZ = #{specRotZ}
+      // Define custom schema for syncing avatar color, set by random-color
+      var avatarSchema = {
+      template: '#avatar-template',
+      components: [
+      'position',
+      'rotation',
+      {
+      selector: '.head',
+      component: 'material'
+      },
+      {
+      selector: '.avatar-image-class',
+      component: 'material'
+      }
+      ]
+      };
+      NAF.schemas.add(avatarSchema);
+  body
+    img#avatar-hud(src='/images/gradient.png')
+    #url_input_div
+      p#media_input_p.p_input
+      input#appendedUrl.url_btns(type='text', placeholder='Enter URL Here', name='URL', required='')
+      button.url_btns(onclick='mediaLoader()') Submit
+      button.url_btns(onclick='mediaLoader()') No Thanks
+    #menu_div
+      //
+        <button name="Expand" class="menu_btn" id="expand_btn">
+        <img class="menu_icon" src="/ui/icons/expand.png">
+        </button>
+        <button name="Collapse" class="menu_btn exp" id="collapse_btn">
+        <img class="menu_icon" src="/ui/icons/collapse.png">
+        </button>
+      button#savelocationbutton.menu_btn.exp(name='Save Location', onclick='savePosition()')
+        img.menu_icon(src='/ui/icons/location.png', style='filter: invert(100%);')
+      input#media_input.upload(type='file', style='display:none', single='')
+      button#addmedia_btn.menu_btn.exp(name='Add Media', onclick='uploadMedia()')
+        img.menu_icon(src='/ui/icons/addmedia.png')
+      input#avatar_input.upload(type='file', style='display:none', single='')
+      button#avatar_menu_btn.menu_btn.exp(name='Upload Avatar', onclick='uploadAvatar()')
+        img.menu_icon(src='/ui/icons/addavatar.png')
+      button#enter_vr.menu_btn(name='VR Mode')
+        img.menu_icon(src='/ui/icons/cardboard.png')
+    a-scene(networked-scene="room: "+roomToJoin+";debug: true;", vr-mode-ui='enabled: false')
+      a-assets
+        img#grid(src='https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png', crossorigin='anonymous')
+        img#sky(src='/images/underwater.jpg', crossorigin='anonymous')
+        //
+          <a-asset-item id="spongebob-obj" src="/models/spongebob/model.obj"></a-asset-item>
+          <a-asset-item id="spongebob-mtl" src="/models/spongebob/materials.mtl"></a-asset-item>
+        // Avatar
+        script#avatar-template(type='text/html').
+          <a-entity class="avatar">
+          <a-image class="avatar-image-class" material="src: url(/images/gradient.png)" scale="5 5 5" position="2 2 2">
+          </a-image>
+          <!--<a-entity obj-model="obj: #spongebob-obj; mtl: #spongebob-mtl"></a-entity>-->
+          <a-sphere class="head"
+          color="#5985ff"
+          scale="0.45 0.5 0.4"
+          random-color
+          ></a-sphere>
+          <a-entity class="face"
+          position="0 0.05 0"
+          >
+          <a-sphere class="eye"
+          color="#efefef"
+          position="0.16 0.1 -0.35"
+          scale="0.12 0.12 0.12"
+          >
+          <a-sphere class="pupil"
+          color="#000"
+          position="0 0 -1"
+          scale="0.2 0.2 0.2"
+          ></a-sphere>
+          </a-sphere>
+          <a-sphere class="eye"
+          color="#efefef"
+          position="-0.16 0.1 -0.35"
+          scale="0.12 0.12 0.12"
+          >
+          <a-sphere class="pupil"
+          color="#000"
+          position="0 0 -1"
+          scale="0.2 0.2 0.2"
+          ></a-sphere>
+          </a-sphere>
+          </a-entity>
+          </a-entity>
+        // /Templates
+      a-entity#player(networked='template:#avatar-template;showLocalTemplate:false;', camera='', spawn-in-circle='radius:3;', position='0 1.3 0', wasd-controls='', look-controls='')
+      a-entity(position='0 0 0', geometry='primitive: plane; width: 10000; height: 10000;', rotation='-90 0 0', material='src: #grid; repeat: 10000 10000; transparent: true; metalness:0.6; roughness: 0.4; sphericalEnvMap: #sky;')
+      a-entity(light='color: #ccccff; intensity: 1; type: ambient;', visible='')
+      a-entity(light='color: #ffaaff; intensity: 1.5', position='5 5 5')
+      a-sky(src='#sky', rotation='0 -90 0')
+      a-entity#particles(particle-system='preset: snow')
+      a-image#adventurecorp(material='src: url(/images/Adventure_Corporation.png)', scale='20 20 20', position='0 7 10', rotation='0 180 0')
+      a-image#adventurecorp(material='src: url(/images/welcome0-01.jpg)', scale='15 15 15', position='0 7 -15', rotation='0 0 0')
+    script.
+      // On mobile remove elements that are resource heavy
+      var isMobile = AFRAME.utils.device.isMobile();
+      if (isMobile) {
+      var particles = document.getElementById('particles');
+      particles.parentNode.removeChild(particles);
+      }
+      NAF.connection.subscribeToDataChannel('imagePlaced', avatarCallback);
+      function avatarCallback(senderRtcId, dataType, data) {
+      console.log("DATA RECEIVED", senderRtcId, dataType, data);
+      var image = JSON.parse(data);
+      addImageToScene(image.src, image.position, image.rotation, image.url);
+      };
