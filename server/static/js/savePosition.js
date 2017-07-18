@@ -9,10 +9,13 @@ function savePosition() {
     type: 'POST',
     data: JSON.stringify(data),
     contentType: 'application/json',
-    url: location.protocol + '//' + location.host + location.pathname + 'savePosition',
+    url: location.protocol + '//' + location.host + location.pathname + '/savePosition',
     success: function(data) {
       console.log('successfully sent position to server.');
-      $("<p>come back to this exact position: " + location.protocol + '//' + location.host + location.pathname + 'loc/' + data + "</p>").insertAfter(document.getElementById("savelocationbutton"));
+      var pathname = document.location.pathname.substring(1);
+      var parts = pathname.split(/\//);
+      var room = parts[1];
+      $("<p>come back to this exact position: " + location.protocol + '//' + location.host + '/room/' + room + '/loc/' + data + "</p>").insertAfter(document.getElementById("savelocationbutton"));
     }
   });
 

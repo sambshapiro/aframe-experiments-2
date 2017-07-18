@@ -16,6 +16,15 @@ AFRAME.registerComponent('spawn-in-circle', {
     var angleToCenter = -1 * angleDeg + 90;
     var rotationStr = '0 ' + angleToCenter + ' 0';
     el.setAttribute('rotation', rotationStr);
+    console.log("my rotation is [" + el.getAttribute('rotation').x + ", " + el.getAttribute('rotation').y + ", " + el.getAttribute('rotation').z + "]");
+
+    if (typeof specLocX !== 'undefined') {
+      console.log("moving to saved position");
+      var movePos = new THREE.Vector3(specLocX, specLocY, specLocZ);
+      var moveRot = new THREE.Vector3(specRotX, specRotY, specRotZ);
+      document.querySelector('a-scene').querySelector('#player').setAttribute('position',movePos);
+      document.querySelector('a-scene').querySelector('#player').setAttribute('rotation',moveRot);
+    }
   },
 
   getRandomAngleInRadians: function() {

@@ -4,6 +4,7 @@ var express = require("express");           // web framework external module
 var serveStatic = require('serve-static');  // serve static files
 var socketIo = require("socket.io");        // web socket external module
 var easyrtc = require("easyrtc");           // EasyRTC external module
+var pug = require('pug');
 
 //var mongodb = require('mongodb');
 //var config = require('../server/config');
@@ -29,6 +30,9 @@ var port = process.env.PORT || 8080;
 var app = express();
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(serveStatic('server/static', {'index': ['index.html']}));
+app.use(express.static('static'));
+app.set('view engine', 'pug');
+app.set('views', './server/views');
 
 // Start Express http server
 var webServer = http.createServer(app).listen(port);
@@ -96,23 +100,33 @@ webServer.listen(port, function () {
 
 conn.once("open", function(){
 
+  app.get('/', function (req, res) {
+    res.redirect('/room/home');
+  });
+
+  app.get('/room/:room', function (req, res) {
+    res.render('index', { roomToJoin: req.params.room })
+  });
+
   var imagesSchema = mongoose.Schema({
+    room: String,
     src: String,
     position: mongoose.Schema.Types.Mixed,
     rotation: mongoose.Schema.Types.Mixed,
-    url: String
+    link: String
   });
   var image = mongoose.model('image', imagesSchema);
 
   var locationSchema = mongoose.Schema({
-    id: String,
+    room: String,
+    shortid: String,
     position: mongoose.Schema.Types.Mixed,
     rotation: mongoose.Schema.Types.Mixed
   });
   var location = mongoose.model('location', locationSchema);
 
-  app.post("/imageUpload", function(req, res){
-    var newImage = new image({ src: req.body.src, position: req.body.position, rotation: req.body.rotation, url: req.body.url });
+  app.post("/room/:room/*/imageUpload", function(req, res){
+    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.url });
     newImage.save(function (err, newImage) {
       if (err) return console.error(err);
       console.log("image successfully added to database");
@@ -120,18 +134,34 @@ conn.once("open", function(){
     res.end();
   });
 
-  app.get("/retrieveImages", function(req, res){
-    image.find(function (err, images) {
+  app.post("/room/:room/imageUpload", function(req, res){
+    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.url });
+    newImage.save(function (err, newImage) {
       if (err) return console.error(err);
-      console.log(images);
-      res.send(JSON.stringify(images));
+      console.log("image successfully added to database");
     });
-
+    res.end();
   });
 
-  app.post("/savePosition", function(req, res){
+  app.get("/room/:room/*/retrieveImages", function(req, res){
+    image.find({ room: req.params.room }).exec(function (err, images) {
+      if (err) return console.error(err);
+      //console.log(images);
+      res.send(JSON.stringify(images));
+    });
+  });
+
+  app.get("/room/:room/retrieveImages", function(req, res){
+    image.find({ room: req.params.room }).exec(function (err, images) {
+      if (err) return console.error(err);
+      //console.log(images);
+      res.send(JSON.stringify(images));
+    });
+  });
+
+  app.post("/room/:room/*/savePosition", function(req, res){
     var newId = shortid.generate();
-    var savedLocation = new location({ id: newId, position: req.body.position, rotation: req.body.rotation });
+    var savedLocation = new location({ room: req.params.room, shortid: newId, position: req.body.position, rotation: req.body.rotation });
     savedLocation.save(function (err, savedLocation) {
       if (err) return console.error(err);
       console.log("location successfully added to database");
@@ -139,22 +169,22 @@ conn.once("open", function(){
     });
   });
 
-  app.get("/loc/:shortid", function(req, res){
+  app.get("/room/:room/loc/:shortid", function(req, res){
     //if(err) return res.send("No location found");
     console.log("shortid is " + req.params.shortid);
-    location.findOne({ 'id' : req.params.shortid }, function (err, location) {
+    location.findOne({ 'shortid' : req.params.shortid }, function (err, location) {
       if (err) return console.error(err);
       console.log("location.position " + JSON.stringify(location.position));
       console.log("location.rotation " + JSON.stringify(location.rotation));
-      res.redirect(
-        '/?specLocX=' + location.position.x +
-        '&specLocY=' + location.position.y +
-        '&specLocZ=' + location.position.z +
-        '/?specRotX=' + location.rotation.x +
-        '&specRotY=' + location.rotation.y +
-        '&specRotZ=' + location.rotation.z);
+      res.render('index', {
+        roomToJoin: req.params.room,
+        specLocX: location.position.x,
+        specLocY: location.position.y,
+        specLocZ: location.position.z,
+        specRotX: location.rotation.x,
+        specRotY: location.rotation.y,
+        specRotZ: location.rotation.z
+      });
     });
   });
-
-
 });
