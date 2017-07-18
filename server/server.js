@@ -159,6 +159,16 @@ conn.once("open", function(){
     });
   });
 
+  app.post("/room/:room/savePosition", function(req, res){
+    var newId = shortid.generate();
+    var savedLocation = new location({ room: req.params.room, shortid: newId, position: req.body.position, rotation: req.body.rotation });
+    savedLocation.save(function (err, savedLocation) {
+      if (err) return console.error(err);
+      console.log("location successfully added to database");
+      res.send(newId);
+    });
+  });
+
   app.post("/room/:room/*/savePosition", function(req, res){
     var newId = shortid.generate();
     var savedLocation = new location({ room: req.params.room, shortid: newId, position: req.body.position, rotation: req.body.rotation });
