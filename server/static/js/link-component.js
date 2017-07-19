@@ -1,6 +1,6 @@
-AFRAME.registerComponent('url', {
+AFRAME.registerComponent('link', {
   schema: {
-    url: {default: ""},
+    link: {default: ""},
     movedAway: {default: true}
   },
   tick: function (time, timeDelta) {
@@ -10,14 +10,14 @@ AFRAME.registerComponent('url', {
       playerPos.x > (this.el.getAttribute('position').x - .5) &&
       playerPos.z < (this.el.getAttribute('position').z + .5) &&
       playerPos.z > (this.el.getAttribute('position').z - .5) &&
-      this.el.getAttribute('url').movedAway
+      this.data.movedAway
     ) {
       console.log("PASSED THROUGH IMAGE");
-      window.open(this.el.getAttribute('url').url);
-      this.el.setAttribute('url', 'movedAway', 'false');
-      console.log("moved away: " + this.el.getAttribute('url').movedAway);
+      console.log(this.data.link);
+      window.open(this.data.link);
+      this.data.movedAway = false;
     }
-    if (!this.el.getAttribute('url').movedAway) {
+    if (!this.data.movedAway) {
       if (
         playerPos.x > (this.el.getAttribute('position').x + 2) ||
         playerPos.x < (this.el.getAttribute('position').x - 2) ||
@@ -26,7 +26,7 @@ AFRAME.registerComponent('url', {
       )
       {
         console.log("MOVED AWAY FROM IMAGE");
-        this.el.setAttribute('url', 'movedAway', 'true');
+        this.data.movedAway = true;
       }
     }
   }

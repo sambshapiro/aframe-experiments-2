@@ -15,7 +15,7 @@ html
     script(src='https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js')
     script(src='https://unpkg.com/aframe-particle-system-component@1.0.5/dist/aframe-particle-system-component.min.js')
     script(src='/js/spawn-in-circle.component.js')
-    script(src='/js/url-component.js')
+    script(src='/js/link-component.js')
     script(src='/js/savePosition.js')
     script(src='/js/menu-ui.js')
     script(src='/js/uploadAvatar.js')
@@ -47,11 +47,11 @@ html
       NAF.schemas.add(avatarSchema);
   body
     img#avatar-hud(src='/images/gradient.png')
-    #url_input_div
+    #link_input_div
       p#media_input_p.p_input
-      input#appendedUrl.url_btns(type='text', placeholder='Enter URL Here', name='URL', required='')
-      button.url_btns(onclick='mediaLoader()') Submit
-      button.url_btns(onclick='mediaLoader()') No Thanks
+      input#appendedLink.link_btns(type='text', placeholder='Enter URL Here', name='Link', required='')
+      button.link_btns(onclick='mediaLoader()') Submit
+      button.link_btns(onclick='mediaLoader()') No Thanks
     #menu_div
       //
         <button name="Expand" class="menu_btn" id="expand_btn">
@@ -135,5 +135,5 @@ html
       function avatarCallback(senderRtcId, dataType, data) {
       console.log("DATA RECEIVED", senderRtcId, dataType, data);
       var image = JSON.parse(data);
-      addImageToScene(image.src, image.position, image.rotation, image.url);
+      addImageToScene(image.src, image.position, image.rotation, image.link);
       };

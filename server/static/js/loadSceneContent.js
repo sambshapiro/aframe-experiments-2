@@ -1,4 +1,4 @@
-function addImageToScene(src, position, rotation, url) {
+function addImageToScene(src, position, rotation, link) {
   var containerEl = document.createElement('a-entity');
   var entityEl = document.createElement('a-image');
   containerEl.appendChild(entityEl);
@@ -7,7 +7,7 @@ function addImageToScene(src, position, rotation, url) {
   entityEl.setAttribute('position',position);
   entityEl.setAttribute('rotation',rotation);
   entityEl.setAttribute('material', 'src', 'url(' + src + ')');
-  entityEl.setAttribute('url', 'url', url);
+  entityEl.setAttribute('link', 'link', link);
 }
 
 //Add all images from database into the scene
@@ -20,8 +20,8 @@ $.ajax({
     var images = JSON.parse(JSON.stringify(data));
     console.log("numImages = " + images.length);
     for (var i = 0; i < images.length; i++) {
-      console.log("image " + i);
-      addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].url);
+      console.log("image " + i + ", linke: " + images[i].link);
+      addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].link);
     }
   }
 });

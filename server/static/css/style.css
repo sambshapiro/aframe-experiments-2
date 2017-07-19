@@ -54,7 +54,7 @@ button.menu_btn{
   width: 64px;
 }
 
-#url_input_div{
+#link_input_div{
   margin: -50px 0 0 -150px;
   display:none;
   position:absolute;
@@ -76,7 +76,7 @@ p.p_input{
   color:black;
 }
 
-.url_btns {
+.link_btns {
   position: relative;
   border: 0px solid #ccc;
   display: inline-block;
@@ -90,7 +90,7 @@ p.p_input{
   font-weight: 700;
 }
 
-#appendedUrl {
+#appendedLink {
   cursor: text;
 }
 
