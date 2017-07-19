@@ -13,8 +13,23 @@ function uploadMedia() {
   $("#media_input").click();
 }
 
-function mediaLoader() {
+function checkLink() {
   var link = document.getElementById("appendedLink").value;
+  //og: /((ftp|http|https):\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+  var urlWithHeader = /((ftp|http|https):\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+  var urlWithoutHeader = /(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+  if (urlWithHeader.test(link)) {
+    mediaLoader(link);
+  }
+  else if (urlWithoutHeader.test(link)) {
+    mediaLoader("http://" + link);
+  }
+  else {
+    document.getElementById("appendedLink").value = "Invalid URL.";
+  }
+}
+
+function mediaLoader(link) {
   document.getElementById("appendedLink").value = "";
   var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
   var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
@@ -42,12 +57,15 @@ function mediaLoader() {
     }
 
     else if (filetype.includes('image')){
+      //adds image to scene for yourself
       addImageToScene(reader.result, setPosition, setRotation, link);
 
       var data = { src: reader.result, position: setPosition, rotation: setRotation, link: link };
       console.log("broadcasting data");
+      //adds image to scene for others in room NOW
       NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));
 
+      //adds image to scene for others in room LATER
       $.ajax({
         type: 'POST',
         data: JSON.stringify(data),
