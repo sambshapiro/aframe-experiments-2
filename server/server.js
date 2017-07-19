@@ -5,6 +5,11 @@ var serveStatic = require('serve-static');  // serve static files
 var socketIo = require("socket.io");        // web socket external module
 var easyrtc = require("easyrtc");           // EasyRTC external module
 var pug = require('pug');
+//var slack = require('slack-incoming-webhook');
+//var send = slack({url: '{https://hooks.slack.com/services/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}'});
+//send({"text": "hello"});
+//var request = require('request-promise');
+//const  {SCOPE, TOKEN, CLIENT_ID, CLIENT_SECRET} = process.env;
 
 //var mongodb = require('mongodb');
 //var config = require('../server/config');
@@ -33,6 +38,37 @@ app.use(serveStatic('server/static', {'index': ['index.html']}));
 app.use(express.static('static'));
 app.set('view engine', 'pug');
 app.set('views', './server/views');
+/*app.use('/slack', slack({
+scope: 'bot,commands,incoming-webhook',
+token: 'fbXTXSVnA5kP72Zgv3vCqsuK',
+store: 'data/team.json',
+client_id: '215025528775.215697609975',
+client_secret: '68f547f14d8d24b90e11061ca514437e'
+}));
+// handle the "/test" slash commands
+slack.on('/test', (payload, bot) => {
+console.log("/test command received");
+bot.reply('hi adventure corp!');
+});*/
+/*var options = {
+method: 'POST',
+uri: 'https://hooks.slack.com/services/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',
+form: {
+text: 'A message\non several\nlines.',
+},
+headers: {
+'content-type': 'application/json'
+}
+};
+request(options)
+.then(function (body) {
+console.log("slack " + body);
+// Display response content
+})
+.catch(function (err) {
+// Display errors if any
+console.log("slack " + err);
+});*/
 
 // Start Express http server
 var webServer = http.createServer(app).listen(port);
@@ -126,7 +162,7 @@ conn.once("open", function(){
   var location = mongoose.model('location', locationSchema);
 
   app.post("/room/:room/*/imageUpload", function(req, res){
-    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.url });
+    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.link });
     newImage.save(function (err, newImage) {
       if (err) return console.error(err);
       console.log("image successfully added to database");
@@ -135,7 +171,7 @@ conn.once("open", function(){
   });
 
   app.post("/room/:room/imageUpload", function(req, res){
-    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.url });
+    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.link });
     newImage.save(function (err, newImage) {
       if (err) return console.error(err);
       console.log("image successfully added to database");
@@ -184,17 +220,23 @@ conn.once("open", function(){
     console.log("shortid is " + req.params.shortid);
     location.findOne({ 'shortid' : req.params.shortid }, function (err, location) {
       if (err) return console.error(err);
-      console.log("location.position " + JSON.stringify(location.position));
-      console.log("location.rotation " + JSON.stringify(location.rotation));
-      res.render('index', {
-        roomToJoin: req.params.room,
-        specLocX: location.position.x,
-        specLocY: location.position.y,
-        specLocZ: location.position.z,
-        specRotX: location.rotation.x,
-        specRotY: location.rotation.y,
-        specRotZ: location.rotation.z
-      });
+      if (location.room == req.params.room) {
+        console.log("location.position " + JSON.stringify(location.position));
+        console.log("location.rotation " + JSON.stringify(location.rotation));
+        res.render('index', {
+          roomToJoin: req.params.room,
+          specLocX: location.position.x,
+          specLocY: location.position.y,
+          specLocZ: location.position.z,
+          specRotX: location.rotation.x,
+          specRotY: location.rotation.y,
+          specRotZ: location.rotation.z
+        });
+      }
+      else {
+        console.log("User tried saved location in a different room than the position was saved in.");
+        res.redirect('/');
+      }
     });
   });
 });

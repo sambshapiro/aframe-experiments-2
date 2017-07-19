@@ -2,7 +2,7 @@ var reader = new FileReader();
 
 $(document).ready(function(){
   document.getElementById("media_input").addEventListener("change", function() {
-    $("#url_input_div").show();
+    $("#link_input_div").show();
     $('#media_input_p').text("Append URL to Media?");
     //mediaLoader();
   });
@@ -13,15 +13,30 @@ function uploadMedia() {
   $("#media_input").click();
 }
 
-function mediaLoader() {
-  var url = document.getElementById("appendedUrl").value;
-  document.getElementById("appendedUrl").value = "";
+function checkLink() {
+  var link = document.getElementById("appendedLink").value;
+  //og: /((ftp|http|https):\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+  var urlWithHeader = /((ftp|http|https):\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+  var urlWithoutHeader = /(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+  if (urlWithHeader.test(link)) {
+    mediaLoader(link);
+  }
+  else if (urlWithoutHeader.test(link)) {
+    mediaLoader("http://" + link);
+  }
+  else {
+    document.getElementById("appendedLink").value = "Invalid URL.";
+  }
+}
+
+function mediaLoader(link) {
+  document.getElementById("appendedLink").value = "";
   var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
   var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
   var setPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y, currentPosition.z+1);
   var setRotation = currentRotation;
 
-  $("#url_input_div").hide();
+  $("#link_input_div").hide();
   //var files = document.getElementById("media_input").files;
   var file = document.getElementById("media_input").files[0];
   var filetype = file.type;
@@ -42,12 +57,15 @@ function mediaLoader() {
     }
 
     else if (filetype.includes('image')){
-      addImageToScene(reader.result, setPosition, setRotation, url);
+      //adds image to scene for yourself
+      addImageToScene(reader.result, setPosition, setRotation, link);
 
-      var data = { src: reader.result, position: setPosition, rotation: setRotation, url: url };
+      var data = { src: reader.result, position: setPosition, rotation: setRotation, link: link };
       console.log("broadcasting data");
+      //adds image to scene for others in room NOW
       NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));
 
+      //adds image to scene for others in room LATER
       $.ajax({
         type: 'POST',
         data: JSON.stringify(data),
