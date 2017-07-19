@@ -27,6 +27,7 @@
     "body-parser": "^1.17.2",
     "easyrtc": "1.1.0",
     "express": "^4.10.7",
+    "express-slack": "^1.0.11",
     "fs": "0.0.1-security",
     "gridfs-stream": "^1.1.1",
     "jQuery": "^1.7.4",
@@ -38,6 +39,7 @@
     "pug": "^2.0.0-rc.2",
     "serve-static": "^1.8.0",
     "shortid": "^2.2.8",
+    "slack-express": "^5.8.0",
     "socket.io": "^1.4.5",
     "socket.io-client": "^1.4.5",
     "url": "^0.11.0"

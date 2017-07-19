@@ -5,6 +5,8 @@ var serveStatic = require('serve-static');  // serve static files
 var socketIo = require("socket.io");        // web socket external module
 var easyrtc = require("easyrtc");           // EasyRTC external module
 var pug = require('pug');
+var slack = require('express-slack');
+//const  {SCOPE, TOKEN, CLIENT_ID, CLIENT_SECRET} = process.env;
 
 //var mongodb = require('mongodb');
 var config = require('../server/config');
@@ -33,6 +35,18 @@ app.use(serveStatic('server/static', {'index': ['index.html']}));
 app.use(express.static('static'));
 app.set('view engine', 'pug');
 app.set('views', './server/views');
+app.use('/slack', slack({
+  scope: 'bot,commands,incoming-webhook',
+  token: 'fbXTXSVnA5kP72Zgv3vCqsuK',
+  store: 'data/team.json',
+  client_id: '215025528775.215697609975',
+  client_secret: '68f547f14d8d24b90e11061ca514437e'
+}));
+// handle the "/test" slash commands
+slack.on('/test', (payload, bot) => {
+  console.log("/test command received");
+  bot.reply('hi adventure corp!');
+});
 
 // Start Express http server
 var webServer = http.createServer(app).listen(port);
