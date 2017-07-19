@@ -2,7 +2,7 @@ var reader = new FileReader();
 
 $(document).ready(function(){
   document.getElementById("media_input").addEventListener("change", function() {
-    $("#url_input_div").show();
+    $("#link_input_div").show();
     $('#media_input_p').text("Append URL to Media?");
     //mediaLoader();
   });
@@ -14,14 +14,14 @@ function uploadMedia() {
 }
 
 function mediaLoader() {
-  var url = document.getElementById("appendedUrl").value;
-  document.getElementById("appendedUrl").value = "";
+  var link = document.getElementById("appendedLink").value;
+  document.getElementById("appendedLink").value = "";
   var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
   var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
   var setPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y, currentPosition.z+1);
   var setRotation = currentRotation;
 
-  $("#url_input_div").hide();
+  $("#link_input_div").hide();
   //var files = document.getElementById("media_input").files;
   var file = document.getElementById("media_input").files[0];
   var filetype = file.type;
@@ -42,9 +42,9 @@ function mediaLoader() {
     }
 
     else if (filetype.includes('image')){
-      addImageToScene(reader.result, setPosition, setRotation, url);
+      addImageToScene(reader.result, setPosition, setRotation, link);
 
-      var data = { src: reader.result, position: setPosition, rotation: setRotation, url: url };
+      var data = { src: reader.result, position: setPosition, rotation: setRotation, link: link };
       console.log("broadcasting data");
       NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));
 
