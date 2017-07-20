@@ -25,6 +25,31 @@ $.ajax({
     }
   }
 });
+
+$.ajax({
+  dataType: 'json',
+  url: location.protocol + '//' + location.host + location.pathname + '/retrieveMediaCards',
+  success: function(data) {
+    console.log('success');
+    var mediaCards = JSON.parse(JSON.stringify(data));
+    console.log("numMediaCards = " + mediaCards.length);
+    for (var i = 0; i < mediaCards.length; i++) {
+      console.log("mediaCard " + i);
+      addScrapedContent(
+        mediaCards[i].title,
+        mediaCards[i].description,
+        mediaCards[i].src,
+        mediaCards[i].link,
+        mediaCards[i].imgPosition,
+        mediaCards[i].titlePosition,
+        mediaCards[i].descriptionPosition,
+        mediaCards[i].rotation
+      );
+    }
+  }
+});
+
+
 function getUrlParameter(name) {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
   var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
