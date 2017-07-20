@@ -5,6 +5,7 @@ var serveStatic = require('serve-static');  // serve static files
 var socketIo = require("socket.io");        // web socket external module
 var easyrtc = require("easyrtc");           // EasyRTC external module
 var pug = require('pug');
+var urlMetadata = require('url-metadata');
 //var slack = require('slack-incoming-webhook');
 //var send = slack({url: '{https://hooks.slack.com/services/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}'});
 //send({"text": "hello"});
@@ -161,6 +162,19 @@ conn.once("open", function(){
   });
   var location = mongoose.model('location', locationSchema);
 
+  var metadataContentSchema = mongoose.Schema({
+    room: String,
+    title: String,
+    description: String,
+    src: String,
+    link: String,
+    imgPosition: mongoose.Schema.Types.Mixed,
+    titlePosition: mongoose.Schema.Types.Mixed,
+    descriptionPosition: mongoose.Schema.Types.Mixed,
+    rotation: mongoose.Schema.Types.Mixed
+  });
+  var metadataContent = mongoose.model('metadataContent', metadataContentSchema);
+
   app.post("/room/:room/*/imageUpload", function(req, res){
     var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.link });
     newImage.save(function (err, newImage) {
@@ -179,7 +193,7 @@ conn.once("open", function(){
     res.end();
   });
 
-  app.get("/room/:room/*/retrieveImages", function(req, res){
+  app.get("/room/:room/retrieveImages", function(req, res){
     image.find({ room: req.params.room }).exec(function (err, images) {
       if (err) return console.error(err);
       //console.log(images);
@@ -187,7 +201,7 @@ conn.once("open", function(){
     });
   });
 
-  app.get("/room/:room/retrieveImages", function(req, res){
+  app.get("/room/:room/*/retrieveImages", function(req, res){
     image.find({ room: req.params.room }).exec(function (err, images) {
       if (err) return console.error(err);
       //console.log(images);
@@ -239,4 +253,77 @@ conn.once("open", function(){
       }
     });
   });
-});
+
+  app.get("/room/:room/retrieveMediaCards", function(req, res){
+    metadataContent.find({ room: req.params.room }).exec(function (err, mediaCard) {
+      if (err) return console.error(err);
+      //console.log(images);
+      res.send(JSON.stringify(mediaCard));
+    });
+  });
+
+  app.get("/room/:room/*/retrieveMediaCards", function(req, res){
+    metadataContent.find({ room: req.params.room }).exec(function (err, mediaCard) {
+      if (err) return console.error(err);
+      //console.log(images);
+      res.send(JSON.stringify(mediaCard));
+    });
+  });
+
+  app.post("/room/:room/metadata", function(req, res){
+    urlMetadata(req.body.link, {fromEmail: 'discover@adventure.pizza'}).then(
+      function (metadata) { // success handler
+        var data = {"title":metadata["og:title"], "description":metadata["og:description"], "image":metadata["og:image"], "link":req.body.link};
+        var savedMetadata = new metadataContent({
+          room: req.params.room,
+          title: data.title,
+          description: data.description,
+          src: data.image,
+          link: req.body.link,
+          imgPosition: req.body.imgPosition,
+          titlePosition: req.body.titlePosition,
+          descriptionPosition: req.body.descriptionPosition,
+          rotation: req.body.rotation
+        });
+        savedMetadata.save(function (err, savedMetadata) {
+          if (err) return console.error(err);
+          console.log("metadata successfully added to database");
+        });
+        res.send(data);
+      },
+      function (error) { // failure handler
+        console.log(error)
+      });
+    });
+
+    app.post("/room/:room/*/metadata", function(req, res){
+      urlMetadata(req.body.link, {fromEmail: 'discover@adventure.pizza'}).then(
+        function (metadata) { // success handler
+          var data = {"title":metadata["og:title"], "description":metadata["og:description"], "image":metadata["og:image"], "link":req.body.link};
+          var savedMetadata = new metadataContent({
+            room: req.params.room,
+            title: data.title,
+            description: data.description,
+            src: data.image,
+            link: req.body.link,
+            imgPosition: req.body.imgPosition,
+            titlePosition: req.body.titlePosition,
+            descriptionPosition: req.body.descriptionPosition,
+            rotation: req.body.rotation
+          });
+          savedMetadata.save(function (err, savedMetadata) {
+            if (err) return console.error(err);
+            console.log("metadata successfully added to database");
+          });
+          res.send(data);
+        },
+        function (error) { // failure handler
+          console.log(error)
+        });
+      });
+
+    app.get('*', function (req, res) {
+      res.redirect('/room/home');
+    });
+
+  });

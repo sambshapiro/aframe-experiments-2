@@ -2,6 +2,7 @@ var reader = new FileReader();
 
 $(document).ready(function(){
   document.getElementById("media_input").addEventListener("change", function() {
+    $("#media_choice_div").hide();
     $("#link_input_div").show();
     $('#media_input_p').text("Append URL to Media?");
     //mediaLoader();
@@ -9,34 +10,80 @@ $(document).ready(function(){
 
 });
 
+function mediaChoice() {
+  $("#media_choice_div").show();
+}
+
 function uploadMedia() {
   $("#media_input").click();
 }
 
-function checkLink() {
-  var link = document.getElementById("appendedLink").value;
+function useSiteContent(link) {
+  $("#media_choice_div").hide();
+  console.log("sending link to server: " + link);
+  var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
+  var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
+  var imgPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y, currentPosition.z+1);
+  var titlePosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y+1, currentPosition.z+1);
+  var descriptionPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y+0.8, currentPosition.z+1);
+  var rotation = currentRotation;
+  var data = {'link':link, 'imgPosition':imgPosition, 'titlePosition':titlePosition, 'descriptionPosition':descriptionPosition, 'rotation':rotation};
+  $.ajax({
+    type: 'POST',
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    url: location.protocol + '//' + location.host + location.pathname + '/metadata',
+    success: function(data) {
+      console.log('successly received scraped content from server');
+      addScrapedContent(data.title, data.description, data.image, data.link, imgPosition, titlePosition, descriptionPosition, rotation);
+      console.log("broadcasting data");
+      var broadcastData = {'title':data.title, 'description':data.description, 'image':data.image, 'link':link, 'imgPosition':imgPosition, 'titlePosition':titlePosition, 'descriptionPosition':descriptionPosition, 'rotation':rotation};
+      NAF.connection.broadcastDataGuaranteed('mediaCardPlaced', JSON.stringify(broadcastData));
+    }
+  });
+}
+
+function validateLink(link) {
   //og: /((ftp|http|https):\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
   var urlWithHeader = /((ftp|http|https):\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
   var urlWithoutHeader = /(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
-  if (urlWithHeader.test(link)) {
-    mediaLoader(link);
+
+  if (urlWithHeader.test(link)) return 0;
+  else if (urlWithoutHeader.test(link)) return 1;
+  else return 9;
+}
+
+function checkLink(callback) {
+  if ( callback == mediaLoader ) {
+    console.log("callback is mediaLoader");
+    var el = document.getElementById("appendedLink");
   }
-  else if (urlWithoutHeader.test(link)) {
-    mediaLoader("http://" + link);
+  else if ( callback == useSiteContent ) {
+    console.log("callback is useSiteContent");
+    var el = document.getElementById("contentLink");
+  }
+  else console.error("check link function");
+  var link = el.value;
+  if (validateLink(link)==0) {
+    callback(link);
+    el.value = "";
+  }
+  else if (validateLink(link)==1) {
+    callback("http://" + link);
+    el.value = "";
   }
   else {
-    document.getElementById("appendedLink").value = "Invalid URL.";
+    el.value = "Invalid URL.";
   }
 }
 
 function mediaLoader(link) {
-  document.getElementById("appendedLink").value = "";
+  $("#link_input_div").hide();
   var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
   var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
   var setPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y, currentPosition.z+1);
   var setRotation = currentRotation;
 
-  $("#link_input_div").hide();
   //var files = document.getElementById("media_input").files;
   var file = document.getElementById("media_input").files[0];
   var filetype = file.type;
