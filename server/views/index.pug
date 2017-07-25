@@ -21,15 +21,18 @@ html
     script(src='/js/menu-ui.js')
     script(src='/js/uploadAvatar.js')
     script(src='/js/uploadMedia.js')
+    script(src='/js/aframe-extras.min.js')
     script(src='/js/slackNotify.js')
+    if specLocX
+      script.
+        specLocX = #{specLocX};
+        specLocY = #{specLocY};
+        specLocZ = #{specLocZ};
+        specRotX = #{specRotX};
+        specRotY = #{specRotY};
+        specRotZ = #{specRotZ};
     script.
-      console.log("pug template, room is #{roomToJoin}")
-      var specLocX = #{specLocX};
-      var specLocY = #{specLocY};
-      var specLocZ = #{specLocZ};
-      var specRotX = #{specRotX};
-      var specRotY = #{specRotY};
-      var specRotZ = #{specRotZ}
+      console.log("pug template, room is #{roomToJoin}");
       // Define custom schema for syncing avatar color, set by random-color
       var avatarSchema = {
       template: '#avatar-template',
@@ -122,7 +125,14 @@ html
           </a-entity>
           </a-entity>
         // /Templates
-      a-entity#player(networked='template:#avatar-template;showLocalTemplate:false;', camera='', spawn-in-circle='radius:3;', position='0 1.3 0', wasd-controls='', look-controls='')
+      a-entity#player(networked='template:#avatar-template;showLocalTemplate:false;', camera='', spawn-in-circle='radius:3;', position='0 1.3 0', wasd-controls='')
+      script.
+        if (AFRAME.utils.device.isMobile ()) {
+        document.querySelectorAll('#player')[0].setAttribute('universal-controls','');
+        }
+        else {
+        document.querySelectorAll('#player')[0].setAttribute('look-controls','');
+        }
       a-entity(position='0 0 0', geometry='primitive: plane; width: 10000; height: 10000;', rotation='-90 0 0', material='src: #grid; repeat: 10000 10000; transparent: true; metalness:0.6; roughness: 0.4; sphericalEnvMap: #sky;')
       a-entity(light='color: #ccccff; intensity: 1; type: ambient;', visible='')
       a-entity(light='color: #ffaaff; intensity: 1.5', position='5 5 5')

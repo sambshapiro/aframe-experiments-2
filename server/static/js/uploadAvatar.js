@@ -14,6 +14,12 @@ function avatarLoader() {
   var file = document.getElementById("avatar_input").files[0];
   var filetype = file.type;
 
+  if (file) {
+    reader.readAsDataURL(file);
+  } else {
+    console.log("Reader fail")
+  }
+
   reader.onload = function() {
     console.log("file type " + filetype);
 
@@ -32,11 +38,6 @@ function avatarLoader() {
     }
 
 
-  }
-  if (file) {
-    reader.readAsDataURL(file);
-  } else {
-    console.log("Reader fail")
   }
 
 }
