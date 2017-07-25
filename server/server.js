@@ -234,22 +234,24 @@ conn.once("open", function(){
     console.log("shortid is " + req.params.shortid);
     location.findOne({ 'shortid' : req.params.shortid }, function (err, location) {
       if (err) return console.error(err);
-      if (location.room == req.params.room) {
-        console.log("location.position " + JSON.stringify(location.position));
-        console.log("location.rotation " + JSON.stringify(location.rotation));
-        res.render('index', {
-          roomToJoin: req.params.room,
-          specLocX: location.position.x,
-          specLocY: location.position.y,
-          specLocZ: location.position.z,
-          specRotX: location.rotation.x,
-          specRotY: location.rotation.y,
-          specRotZ: location.rotation.z
-        });
+      else if (location != null) {
+        if (location.room == req.params.room) {
+          console.log("location.position " + JSON.stringify(location.position));
+          console.log("location.rotation " + JSON.stringify(location.rotation));
+          res.render('index', {
+            roomToJoin: req.params.room,
+            specLocX: location.position.x,
+            specLocY: location.position.y,
+            specLocZ: location.position.z,
+            specRotX: location.rotation.x,
+            specRotY: location.rotation.y,
+            specRotZ: location.rotation.z
+          });
+        }
       }
       else {
-        console.log("User tried saved location in a different room than the position was saved in.");
-        res.redirect('/');
+        console.log("User tried invalid location.");
+        res.redirect('/room/'+req.params.room);
       }
     });
   });
@@ -322,8 +324,8 @@ conn.once("open", function(){
         });
       });
 
-    app.get('*', function (req, res) {
-      res.redirect('/room/home');
-    });
+      app.get('*', function (req, res) {
+        res.redirect('/room/home');
+      });
 
-  });
+    });
