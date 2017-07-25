@@ -10,45 +10,49 @@ function addImageToScene(src, position, rotation, link) {
   entityEl.setAttribute('link', 'link', link);
 }
 
-//Add all images from database into the scene
-//var images = {};
-$.ajax({
-  dataType: 'json',
-  url: location.protocol + '//' + location.host + location.pathname + '/retrieveImages',
-  success: function(data) {
-    console.log('success');
-    var images = JSON.parse(JSON.stringify(data));
-    console.log("numImages = " + images.length);
-    for (var i = 0; i < images.length; i++) {
-      console.log("image " + i + ", linke: " + images[i].link);
-      addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].link);
-    }
-  }
-});
 
-$.ajax({
-  dataType: 'json',
-  url: location.protocol + '//' + location.host + location.pathname + '/retrieveMediaCards',
-  success: function(data) {
-    console.log('success');
-    var mediaCards = JSON.parse(JSON.stringify(data));
-    console.log("numMediaCards = " + mediaCards.length);
-    for (var i = 0; i < mediaCards.length; i++) {
-      console.log("mediaCard " + i);
-      addScrapedContent(
-        mediaCards[i].title,
-        mediaCards[i].description,
-        mediaCards[i].src,
-        mediaCards[i].link,
-        mediaCards[i].imgPosition,
-        mediaCards[i].titlePosition,
-        mediaCards[i].descriptionPosition,
-        mediaCards[i].rotation
-      );
-    }
-  }
-});
+document.addEventListener("DOMContentLoaded", function(event) {
 
+  //Add all images from database into the scene
+  //var images = {};
+  $.ajax({
+    dataType: 'json',
+    url: location.protocol + '//' + location.host + location.pathname + '/retrieveImages',
+    success: function(data) {
+      console.log('success');
+      var images = JSON.parse(JSON.stringify(data));
+      console.log("numImages = " + images.length);
+      for (var i = 0; i < images.length; i++) {
+        console.log("image " + i + ", linke: " + images[i].link);
+        addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].link);
+      }
+    }
+  });
+
+  $.ajax({
+    dataType: 'json',
+    url: location.protocol + '//' + location.host + location.pathname + '/retrieveMediaCards',
+    success: function(data) {
+      console.log('success');
+      var mediaCards = JSON.parse(JSON.stringify(data));
+      console.log("numMediaCards = " + mediaCards.length);
+      for (var i = 0; i < mediaCards.length; i++) {
+        console.log("mediaCard " + i);
+        addScrapedContent(
+          mediaCards[i].title,
+          mediaCards[i].description,
+          mediaCards[i].src,
+          mediaCards[i].link,
+          mediaCards[i].imgPosition,
+          mediaCards[i].titlePosition,
+          mediaCards[i].descriptionPosition,
+          mediaCards[i].rotation
+        );
+      }
+    }
+  });
+
+});
 
 function getUrlParameter(name) {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
