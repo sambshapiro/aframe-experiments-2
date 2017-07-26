@@ -54,7 +54,7 @@ button.menu_btn{
   width: 64px;
 }
 
-#link_input_div, #media_choice_div{
+#link_input_div, #media_choice_div, #add_room_div{
   margin: -50px 0 0 -150px;
   display:none;
   position:absolute;
@@ -90,7 +90,7 @@ p.p_input{
   font-weight: 700;
 }
 
-#appendedLink, #contentLink {
+#appendedLink, #contentLink, #enterRoomName {
   cursor: text;
 }
 

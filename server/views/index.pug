@@ -62,6 +62,9 @@ html
       button.link_btns(onclick='uploadMedia()') Upload Content
       button.link_btns(onclick='checkLink(useSiteContent)') Use Site Content:
       input#contentLink.link_btns(type='text', placeholder='Enter URL to scrape from here', name='contentLink', required='')
+    #add_room_div
+      input#enterRoomName.link_btns(type='text', placeholder='Room to Add', name='roomToAdd', required='')
+      button.link_btns(onclick='addRoom()') Add Room
     #menu_div
       //
         <button name="Expand" class="menu_btn" id="expand_btn">
@@ -70,7 +73,7 @@ html
         <button name="Collapse" class="menu_btn exp" id="collapse_btn">
         <img class="menu_icon" src="/ui/icons/collapse.png">
         </button>
-      button#add_room_button.menu_btn.exp(name='Add Room', onclick='addRoom()')
+      button#add_room_button.menu_btn.exp(name='Add Room', onclick='addRoomButton()')
         img.menu_icon(src='/ui/icons/roooms.png')
       button#savelocationbutton.menu_btn.exp(name='Save Location', onclick='savePosition()')
         img.menu_icon(src='/ui/icons/location.png', style='filter: invert(100%);')
