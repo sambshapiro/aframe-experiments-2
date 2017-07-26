@@ -23,14 +23,13 @@ function avatarLoader() {
   reader.onload = function() {
     console.log("file type " + filetype);
 
-    if (filetype == 'image/gif') {
-      document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', {src: 'url(' + reader.result + ')', shader: "gif"});
-      document.querySelector('#avatar-hud').setAttribute('src', reader.result);
-    }
-
-    else if (filetype.includes('image')){
+    if (filetype.includes('image')){
       document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', 'src', 'url(' + reader.result + ')');
       document.querySelector('#avatar-hud').setAttribute('src', reader.result);
+
+      if (filetype == 'image/gif') {
+        document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', 'shader', 'gif');
+      }
     }
 
     else {
