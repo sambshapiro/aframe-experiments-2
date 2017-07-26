@@ -92,22 +92,11 @@ function mediaLoader(link) {
 
     console.log("file type " + filetype);
 
-    if (filetype == 'image/gif') {
-
-      console.log("broadcasting data");
-      var data = { src: reader.result, position: setPosition, rotation: setRotation };
-      //NAF.connection.broadcastData('imagePlaced', data);
-      //document.getElementById("avatar-image").src = image.src;
-      //$("#avatar-image").attr('src', 'url(' + image.src + ')');
-      document.querySelector('a-scene').querySelectorAll('.avatar-image-class')[0].setAttribute('material', {src: 'url(' + reader.result + ')', shader: "gif"});
-      document.querySelector('#avatar-hud').setAttribute('src', reader.result);
-    }
-
-    else if (filetype.includes('image')){
+    if (filetype.includes('image')){
       //adds image to scene for yourself
-      addImageToScene(reader.result, setPosition, setRotation, link);
+      addImageToScene(reader.result, setPosition, setRotation, link, filetype == 'image/gif');
 
-      var data = { src: reader.result, position: setPosition, rotation: setRotation, link: link };
+      var data = { src: reader.result, position: setPosition, rotation: setRotation, link: link, gif: filetype == 'image/gif'};
       console.log("broadcasting data");
       //adds image to scene for others in room NOW
       NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));

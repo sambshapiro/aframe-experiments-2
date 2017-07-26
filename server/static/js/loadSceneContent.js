@@ -1,4 +1,4 @@
-function addImageToScene(src, position, rotation, link) {
+function addImageToScene(src, position, rotation, link, gif) {
   var containerEl = document.createElement('a-entity');
   var entityEl = document.createElement('a-image');
   containerEl.appendChild(entityEl);
@@ -8,6 +8,9 @@ function addImageToScene(src, position, rotation, link) {
   entityEl.setAttribute('rotation',rotation);
   entityEl.setAttribute('material', 'src', 'url(' + src + ')');
   entityEl.setAttribute('link', 'link', link);
+  if (gif) {
+    entityEl.setAttribute('material', 'shader', 'gif');
+  }
 }
 
 
@@ -24,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       console.log("numImages = " + images.length);
       for (var i = 0; i < images.length; i++) {
         console.log("image " + i + ", linke: " + images[i].link);
-        addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].link);
+        addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].link, images[i].gif);
       }
     }
   });
