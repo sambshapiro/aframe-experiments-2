@@ -150,7 +150,8 @@ conn.once("open", function(){
     src: String,
     position: mongoose.Schema.Types.Mixed,
     rotation: mongoose.Schema.Types.Mixed,
-    link: String
+    link: String,
+    gif: Boolean
   });
   var image = mongoose.model('image', imagesSchema);
 
@@ -176,7 +177,7 @@ conn.once("open", function(){
   var metadataContent = mongoose.model('metadataContent', metadataContentSchema);
 
   app.post("/room/:room/*/imageUpload", function(req, res){
-    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.link });
+    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.link, gif: req.body.gif});
     newImage.save(function (err, newImage) {
       if (err) return console.error(err);
       console.log("image successfully added to database");
@@ -185,7 +186,7 @@ conn.once("open", function(){
   });
 
   app.post("/room/:room/imageUpload", function(req, res){
-    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.link });
+    var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.link, gif: req.body.gif });
     newImage.save(function (err, newImage) {
       if (err) return console.error(err);
       console.log("image successfully added to database");
