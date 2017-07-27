@@ -14,8 +14,8 @@ var urlMetadata = require('url-metadata');
 //const  {SCOPE, TOKEN, CLIENT_ID, CLIENT_SECRET} = process.env;
 
 //var mongodb = require('mongodb');
-var config = require('../server/config');
-var mLab = 'mongodb://' + config.db.host + '/' + config.db.name;
+//var config = require('../server/config');
+var mLab = 'mongodb://' + process.env.CONFIGDBHOST + '/' + process.env.CONFIGDBNAME;
 //var MongoClient = mongodb.MongoClient;
 //var collection;
 
