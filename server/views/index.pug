@@ -4,17 +4,18 @@ html
     title Adventure Corp
     meta(name='description', content='Adventure Corp')
     link(href='/css/style.css', rel='stylesheet', type='text/css', media='screen')
-    script(src='https://code.jquery.com/jquery-3.2.1.min.js', integrity='sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=', crossorigin='anonymous')
-    script(src='https://aframe.io/releases/0.5.0/aframe.min.js')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js')
-    script(src='https://rawgit.com/mayognaise/aframe-gif-shader/master/dist/aframe-gif-shader.min.js')
-    script(src='https://rawgit.com/mayognaise/aframe-gif-component/master/dist/aframe-gif-component.min.js')
+    link(href='https://fonts.googleapis.com/css?family=Roboto', rel='stylesheet')
+    script(src='/js/lib/jquery-3.2.1.min.js')
+    script(src='/js/lib/aframe-0.5.0.min.js')
+    script(src='/js/lib/socket.io-1.4.5.min.js')
+    script(src='/js/lib/aframe-gif-shader.min.js')
+    script(src='/js/lib/aframe-gif-component.min.js')
+    script(src='/easyrtc/easyrtc.js')
+    script(src='/js/lib/networked-aframe-0.2.1.min.js')
+    script(src='/js/lib/aframe-randomizer-components-3.0.2.min.js')
+    script(src='/js/lib/aframe-particle-system-component-1.0.5.min.js')
     script(src='/js/scraped-site-content.js')
     script(src='/js/loadSceneContent.js')
-    script(src='/easyrtc/easyrtc.js')
-    script(src='https://unpkg.com/networked-aframe/dist/networked-aframe.min.js')
-    script(src='https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js')
-    script(src='https://unpkg.com/aframe-particle-system-component@1.0.5/dist/aframe-particle-system-component.min.js')
     script(src='/js/spawn-in-circle.component.js')
     script(src='/js/link-component.js')
     script(src='/js/savePosition.js')
@@ -24,6 +25,7 @@ html
     script(src='/js/uploadMedia.js')
     script(src='/js/aframe-extras.min.js')
     script(src='/js/slackNotify.js')
+    script(src='/js/close-windows.js')
     if specLocX
       script.
         specLocX = #{specLocX};
@@ -58,27 +60,19 @@ html
       input#appendedLink.link_btns(type='text', placeholder='Enter URL Here', name='Link', required='')
       button.link_btns(onclick='checkLink(mediaLoader)') Submit
       button.link_btns(onclick='mediaLoader("")') No Thanks
-    #media_choice_div
-      button.link_btns(onclick='uploadMedia()') Upload Content
-      button.link_btns(onclick='checkLink(useSiteContent)') Use Site Content:
-      input#contentLink.link_btns(type='text', placeholder='Enter URL to scrape from here', name='contentLink', required='')
     #add_room_div
       input#enterRoomName.link_btns(type='text', placeholder='Room to Add', name='roomToAdd', required='')
       button.link_btns(onclick='addRoom()') Add Room
+    div.searchform.group
+      input#search-box(type='search', placeholder='Paste a URL here')
+      button#goButton(name='Go', onclick='checkLink(useSiteContent)') Go
     #menu_div
-      //
-        <button name="Expand" class="menu_btn" id="expand_btn">
-        <img class="menu_icon" src="/ui/icons/expand.png">
-        </button>
-        <button name="Collapse" class="menu_btn exp" id="collapse_btn">
-        <img class="menu_icon" src="/ui/icons/collapse.png">
-        </button>
       button#add_room_button.menu_btn.exp(name='Add Room', onclick='addRoomButton()')
         img.menu_icon(src='/ui/icons/roooms.png')
       button#savelocationbutton.menu_btn.exp(name='Save Location', onclick='savePosition()')
         img.menu_icon(src='/ui/icons/location.png', style='filter: invert(100%);')
       input#media_input.upload(type='file', style='display:none', single='')
-      button#addmedia_btn.menu_btn.exp(name='Add Media', onclick='mediaChoice()')
+      button#addmedia_btn.menu_btn.exp(name='Add Media', onclick='uploadMedia()')
         img.menu_icon(src='/ui/icons/addmedia.png')
       input#avatar_input.upload(type='file', style='display:none', single='')
       button#avatar_menu_btn.menu_btn.exp(name='Upload Avatar', onclick='uploadAvatar()')
@@ -87,11 +81,10 @@ html
         img.menu_icon(src='/ui/icons/cardboard.png')
     a-scene(networked-scene="room: "+roomToJoin+";debug: true;", vr-mode-ui='enabled: false')
       a-assets
-        img#grid(src='https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png', crossorigin='anonymous')
+        img#grid(src='/images/grid.png', crossorigin='anonymous')
         img#sky(src='/images/underwater.jpg', crossorigin='anonymous')
-        //
-          <a-asset-item id="spongebob-obj" src="/models/spongebob/model.obj"></a-asset-item>
-          <a-asset-item id="spongebob-mtl" src="/models/spongebob/materials.mtl"></a-asset-item>
+        //a-asset-item#aclogo-obj(src='/models/adventurecorp/aclogo_illustrator.obj')
+        //a-asset-item#aclogo-mtl(src='/models/adventurecorp/aclogo_illustrator.mtl')
         // Avatar
         script#avatar-template(type='text/html').
           <a-entity class="avatar">
@@ -144,8 +137,9 @@ html
       a-entity(light='color: #ffaaff; intensity: 1.5', position='5 5 5')
       a-sky(src='#sky', rotation='0 -90 0')
       a-entity#particles(particle-system='preset: snow')
+      //a-entity(obj-model='obj: #aclogo-obj; mtl: #aclogo-mtl', scale ='1 1 1', rotation= '-90 180 0', position = '0 9 10')
       a-image#adventurecorp(material='src: url(/images/Adventure_Corporation.png)', scale='20 20 20', position='0 7 10', rotation='0 180 0')
-      a-image#adventurecorp(material='src: url(/images/welcome0-02.jpg)', scale='15 15 15', position='0 7 -15', rotation='0 0 0')
+      a-image#welcome(material='src: url(/images/welcome0-02.jpg)', scale='15 15 15', position='0 7 -15', rotation='0 0 0')
     script.
       // On mobile remove elements that are resource heavy
       var isMobile = AFRAME.utils.device.isMobile();
