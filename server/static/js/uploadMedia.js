@@ -2,24 +2,17 @@ var reader = new FileReader();
 
 $(document).ready(function(){
   document.getElementById("media_input").addEventListener("change", function() {
-    $("#media_choice_div").hide();
     $("#link_input_div").show();
     $('#media_input_p').text("Append URL to Media?");
-    //mediaLoader();
   });
 
 });
-
-function mediaChoice() {
-  $("#media_choice_div").show();
-}
 
 function uploadMedia() {
   $("#media_input").click();
 }
 
 function useSiteContent(link) {
-  $("#media_choice_div").hide();
   console.log("sending link to server: " + link);
   var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
   var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
@@ -60,20 +53,25 @@ function checkLink(callback) {
   }
   else if ( callback == useSiteContent ) {
     console.log("callback is useSiteContent");
-    var el = document.getElementById("contentLink");
+    var el = document.getElementById("search-box");
   }
   else console.error("check link function");
   var link = el.value;
   if (validateLink(link)==0) {
     callback(link);
     el.value = "";
+    document.getElementById("search-box").style.backgroundColor = "rgba(255,255,255,.5)";
   }
   else if (validateLink(link)==1) {
     callback("http://" + link);
     el.value = "";
+    document.getElementById("search-box").style.backgroundColor = "rgba(255,255,255,.5)";
   }
   else {
     el.value = "Invalid URL.";
+    if ( callback == useSiteContent ) {
+      document.getElementById("search-box").style.backgroundColor = "rgba(255,0,0,.5)";
+    }
   }
 }
 

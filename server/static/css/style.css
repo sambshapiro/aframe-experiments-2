@@ -1,8 +1,58 @@
+/*Mobile*/
+@media (max-width: 1000px) {
+
+  #menu_div{
+    bottom: 7vh;
+  }
+
+  #search-box{
+    width: 70%;
+  }
+
+  #avatar-hud {
+    bottom: 100px;
+  }
+
+  img.menu_icon{
+    height: 25px;
+  }
+
+  button.menu_btn{
+    width: 45px;
+  }
+
+}
+
+/*Desktop*/
+@media (min-width: 999px) {
+
+  #menu_div{
+    bottom: 0;
+  }
+
+  #search-box{
+    width: 50%;
+  }
+
+  #avatar-hud {
+    bottom: 60px;
+  }
+
+  img.menu_icon{
+    height: 32px;
+  }
+
+  button.menu_btn{
+    width: 64px;
+  }
+
+}
+
 .menu_btn{
   background-color: rgba(0, 0, 0, 0);
   color: white;
   font-size: 14pt;
-  font-family:"Proxima Nova";
+  font-family: 'Roboto', sans-serif;
   border: none;
   background: none;
   height: 32px;
@@ -12,34 +62,31 @@
 
 img.menu_icon{
   width: auto;
-  height: 32px;
   -webkit-filter: drop-shadow(1px 1px 1px #444);
   filter: drop-shadow(1px 1px 1px #444);
 }
 
 #avatar-hud {
-  width: auto;
+  width: 100px;
   height: 100px;
   -webkit-filter: drop-shadow(1px 1px 1px #444);
   filter: drop-shadow(1px 1px 1px #444);
   z-index:2;
   position:absolute;
-  margin:12px;
   border:none;
   background-color: rgba(255, 255, 255, 0);
-  right:32px;
-  bottom: 60px;
   text-align: center;
+  right:32px;
+  margin:2em;
 }
 
 #menu_div{
   z-index:2;
   position:absolute;
-  margin:12px;
+  margin:2em;
   border:none;
-  background-color: rgba(255, 255, 255, 0);
+  background-color: transparent;
   right:32px;
-  bottom: 0%;
   text-align: center;
 }
 
@@ -47,14 +94,13 @@ button.menu_btn{
   background-color: rgba(0, 0, 0, 0);
   color: white;
   font-size: 14pt;
-  font-family:"Proxima Nova";
+  font-family: 'Roboto', sans-serif;
   border: none;
   background: none;
-  height: 32px;
-  width: 64px;
+  height: auto;
 }
 
-#link_input_div, #media_choice_div, #add_room_div{
+#link_input_div, #add_room_div{
   margin: -50px 0 0 -150px;
   display:none;
   position:absolute;
@@ -70,7 +116,7 @@ button.menu_btn{
 
 p.p_input{
   text-align: center;
-  font-family: "Proxima Nova";
+  font-family: 'Roboto', sans-serif;
   font-size: 16pt;
   margin-left: 5px;
   color:black;
@@ -83,7 +129,7 @@ p.p_input{
   width: 100%;
   cursor: pointer;
   text-align: center;
-  font-family:"Proxima Nova";
+  font-family: 'Roboto', sans-serif;
   font-size: 13pt;
   color: white;
   background-color:#17BEBB;
@@ -98,3 +144,54 @@ p.p_input{
   width: 12px;
   margin:auto;
 }
+
+/*
+SEARCH BAR FOR PASTING URLS STARTS HERE
+*/
+
+.searchform, #goButton{
+  display: block;
+  overflow: hidden;
+  bottom: 0;
+  position: absolute;
+  z-index:2;
+}
+
+.searchform{
+  width: 100vw;
+  margin: 2em;
+}
+
+#search-box, #goButton{
+  vertical-align: baseline;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-width: 1px 1px 1px;
+  border-radius: 10px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  padding: 0.5em 0.5em;
+  float: left;
+}
+
+#search-box{
+  background-color: rgba(255,255,255,.5);
+}
+
+#goButton{
+  width: auto;
+  margin-left: 1em;
+  color: #3C3C3C;
+  background-color: rgba(255,255,255,1);
+  position: relative;
+}
+
+#search-box:focus {
+  color: #000000;
+  border-color: #000000;
+  outline: none;
+}
+
+/*
+SEARCH BAR FOR PASTING URLS ENDS HERE
+*/
