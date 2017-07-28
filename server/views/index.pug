@@ -10,7 +10,7 @@ html
     script(src='/js/lib/socket.io-1.4.5.min.js')
     script(src='/js/lib/aframe-gif-shader.min.js')
     script(src='/js/lib/aframe-gif-component.min.js')
-    script(src='/js/lib/aframe-environment-component.min.js')
+    //script(src='/js/lib/aframe-environment-component.min.js')
     script(src='/easyrtc/easyrtc.js')
     script(src='/js/lib/networked-aframe-0.2.1.min.js')
     script(src='/js/lib/aframe-randomizer-components-3.0.2.min.js')
@@ -82,9 +82,9 @@ html
         img.menu_icon(src='/ui/icons/cardboard.png')
     a-scene(networked-scene="room: "+roomToJoin+";debug: true;", vr-mode-ui='enabled: false')
       //a-entity(environment='preset: tron; skyColor: #081d43; fog: 0; gridColor: #026800; groundColor: #655853; groundColor2: #694f45; grid: 1x1; dressingAmount: 30; dressingVariance: 10 10 10; dressingScale: 0; dressingColor: #008000; dressing: trees; lights: none; horizonColor: #0079be; groundYScale: 4.54; seed: 14; ground: spikes')
-      a-entity(environment='preset: tron; dressing: trees; dressingColor: #008000; dressingAmount: 30; dressingVariance: 10 10 10; dressingScale: 5')
+      //a-entity(environment='preset: tron; dressing: trees; dressingColor: #008000; dressingAmount: 30; dressingVariance: 10 10 10; dressingScale: 5')
       a-assets
-        //img#grid(src='/images/grid.png', crossorigin='anonymous')
+        img#grid(src='/images/grid.png', crossorigin='anonymous')
         img#sky(src='/images/underwater.jpg', crossorigin='anonymous')
         a-asset-item#rocketship-obj(src='/models/rocketship/model.obj')
         a-asset-item#rocketship-mtl(src='/models/rocketship/materials.mtl')
@@ -137,11 +137,11 @@ html
         else {
         document.querySelectorAll('#player')[0].setAttribute('look-controls','');
         }
-      //a-entity(position='0 0 0', geometry='primitive: plane; width: 10000; height: 10000;', rotation='-90 0 0', material='src: #grid; repeat: 10000 10000; transparent: true; metalness:0.6; roughness: 0.4; sphericalEnvMap: #sky;')
+      a-entity(position='0 0 0', geometry='primitive: plane; width: 10000; height: 10000;', rotation='-90 0 0', material='src: #grid; repeat: 10000 10000; transparent: true; metalness:0.6; roughness: 0.4; sphericalEnvMap: #sky;')
       a-entity(light='color: #ccccff; intensity: 1; type: ambient;', visible='')
       a-entity(light='color: #ffaaff; intensity: 1.5', position='5 5 5')
       a-sky(src='#sky', rotation='0 -90 0')
-      //a-entity#particles(particle-system='preset: snow')
+      a-entity#particles(particle-system='preset: snow')
       a-entity(obj-model='obj: #rocketship-obj; mtl: #rocketship-mtl', scale ='10 10 10', rotation= '0 180 0', position = '0 5 10')
       //a-entity(obj-model='obj: #aclogo-obj; mtl: #aclogo-mtl', scale ='1 1 1', rotation= '-90 180 0', position = '0 9 10')
       a-image#adventurecorp(material='src: url(/images/Adventure_Corporation.png); alphaTest: .001, transparent: true', scale='20 20 20', position='0 7 10', rotation='0 180 0')
