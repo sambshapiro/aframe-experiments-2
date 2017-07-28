@@ -6,7 +6,7 @@ function addImageToScene(src, position, rotation, link, gif) {
   entityEl.setAttribute('visible','true');
   entityEl.setAttribute('position',position);
   entityEl.setAttribute('rotation',rotation);
-  entityEl.setAttribute('material', 'src', 'url(' + src + ')');
+  entityEl.setAttribute('material', 'src', src);
   entityEl.setAttribute('material', 'alphaTest', .001);
   entityEl.setAttribute('material', 'transparent', true);
   entityEl.setAttribute('mylink', 'link', link);
