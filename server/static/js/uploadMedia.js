@@ -100,15 +100,8 @@ function mediaLoader(link) {
       NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));
 
       //adds image to scene for others in room LATER
-      $.ajax({
-        type: 'POST',
-        data: JSON.stringify(data),
-        contentType: 'application/json',
-        url: location.protocol + '//' + location.host + location.pathname + '/imageUpload',
-        success: function(data) {
-          console.log('success');
-        }
-      });
+      //upload to s3, then broadcast in realtime and save to database for later
+      awsGetSignedRequest(file, data);
     }
 
     else {
@@ -116,13 +109,60 @@ function mediaLoader(link) {
 
     }
 
-
   }
   if (file) {
     reader.readAsDataURL(file);
   } else {
     console.log("Reader fail")
   }
+}
 
+function awsGetSignedRequest(file, data){
+  const xhr = new XMLHttpRequest();
+  //TODO add random unique characters after file name to prevent overwriting
+  var name = (file.name).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  xhr.open('GET', `/sign-s3?file-name=${name}&file-type=${file.type}`);
+  xhr.onreadystatechange = () => {
+    if(xhr.readyState === 4){
+      if(xhr.status === 200){
+        const response = JSON.parse(xhr.responseText);
+        awsUploadFile(file, response.signedRequest, response.url, data);
+      }
+      else{
+        alert('Could not upload file (could not get signed URL).');
+      }
+    }
+  };
+  xhr.send();
+}
 
+//TODO add a loading indicator to be displayed between selecting a file and the upload being completed
+
+function awsUploadFile(file, signedRequest, url, data){
+  const xhr = new XMLHttpRequest();
+  xhr.open('PUT', signedRequest);
+  xhr.onreadystatechange = () => {
+    if(xhr.readyState === 4){
+      if(xhr.status === 200){
+        data.src = url;
+        addImageToDatabase(data);
+      }
+      else{
+        alert('Could not upload file.');
+      }
+    }
+  };
+  xhr.send(file);
+}
+
+function addImageToDatabase(data) {
+  $.ajax({
+    type: 'POST',
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    url: location.protocol + '//' + location.host + location.pathname + '/imageUpload',
+    success: function(data) {
+      console.log('success');
+    }
+  });
 }

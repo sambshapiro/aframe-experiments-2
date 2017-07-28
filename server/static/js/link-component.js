@@ -1,4 +1,4 @@
-AFRAME.registerComponent('link', {
+AFRAME.registerComponent('mylink', {
   schema: {
     link: {default: ""},
     movedAway: {default: true}
