@@ -9,7 +9,9 @@ function addScrapedContent(title, description, src, link, imgPosition, titlePosi
     imageEl.setAttribute('position',imgPosition);
     imageEl.setAttribute('rotation',rotation);
     imageEl.setAttribute('material', 'src', 'url(' + src + ')');
-    imageEl.setAttribute('link', 'link', link);
+    imageEl.setAttribute('mylink', 'link', link);
+    imageEl.setAttribute('material', 'alphaTest', .001);
+    imageEl.setAttribute('material', 'transparent', true);
 
     //generate title
     var titleEl = document.createElement('a-text');
