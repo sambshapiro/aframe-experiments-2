@@ -19,13 +19,17 @@ var mLab = 'mongodb://' + process.env.CONFIGDBHOST + '/' + process.env.CONFIGDBN
 //var MongoClient = mongodb.MongoClient;
 //var collection;
 
-var fs = require("fs");
+//var fs = require("fs");
+var request = require("request");
 var mongoose = require("mongoose");
 mongoose.connect(mLab);
 var conn = mongoose.connection;
 var bodyParser = require('body-parser');
 var shortid = require('shortid');
 shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
+
+const aws = require('aws-sdk');
+const S3_BUCKET = process.env.S3_BUCKET;
 
 // Set process name
 process.title = "node-easyrtc";
@@ -195,6 +199,33 @@ conn.once("open", function(){
     res.end();
   });
 
+  //TODO add serverside double-check to make sure filetype is image or allowed media type
+  app.get('/sign-s3', (req, res) => {
+    const s3 = new aws.S3();
+    const fileName = req.query['file-name'];
+    const fileType = req.query['file-type'];
+    const s3Params = {
+      Bucket: S3_BUCKET,
+      Key: fileName,
+      Expires: 60,
+      ContentType: fileType,
+      ACL: 'public-read'
+    };
+
+    s3.getSignedUrl('putObject', s3Params, (err, data) => {
+      if(err){
+        console.log(err);
+        return res.end();
+      }
+      const returnData = {
+        signedRequest: data,
+        url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
+      };
+      res.write(JSON.stringify(returnData));
+      res.end();
+    });
+  });
+
   app.get("/room/:room/retrieveImages", function(req, res){
     image.find({ room: req.params.room }).exec(function (err, images) {
       if (err) return console.error(err);
@@ -278,6 +309,24 @@ conn.once("open", function(){
     urlMetadata(req.body.link, {fromEmail: 'discover@adventure.pizza'}).then(
       function (metadata) { // success handler
         var data = {"title":metadata["og:title"], "description":metadata["og:description"], "image":metadata["og:image"], "link":req.body.link};
+        /*request
+        .get(metadata["og:image"])
+        .on('error', function(err) {
+          console.log(err)
+        })
+        .pipe(fs.createWriteStream('imageWriteStream'));
+        const s3 = new aws.S3();
+        const fileName = metadata["og:title"].replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const s3Params = {
+          Bucket: S3_BUCKET,
+          Key: fileName,
+          Body: imageWriteStream,
+          ACL: 'public-read'
+        };
+        s3.upload(params, function(err, data) {
+          console.log(err, data);
+        });*/
+
         var savedMetadata = new metadataContent({
           room: req.params.room,
           title: data.title,

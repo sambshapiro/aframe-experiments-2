@@ -7,7 +7,9 @@ function addImageToScene(src, position, rotation, link, gif) {
   entityEl.setAttribute('position',position);
   entityEl.setAttribute('rotation',rotation);
   entityEl.setAttribute('material', 'src', 'url(' + src + ')');
-  entityEl.setAttribute('link', 'link', link);
+  entityEl.setAttribute('material', 'alphaTest', .001);
+  entityEl.setAttribute('material', 'transparent', true);
+  entityEl.setAttribute('mylink', 'link', link);
   if (gif) {
     entityEl.setAttribute('material', 'shader', 'gif');
   }
@@ -22,11 +24,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     dataType: 'json',
     url: location.protocol + '//' + location.host + location.pathname + '/retrieveImages',
     success: function(data) {
-      console.log('success');
       var images = JSON.parse(JSON.stringify(data));
       console.log("numImages = " + images.length);
       for (var i = 0; i < images.length; i++) {
-        console.log("image " + i + ", linke: " + images[i].link);
         addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].link, images[i].gif);
       }
     }
@@ -36,11 +36,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     dataType: 'json',
     url: location.protocol + '//' + location.host + location.pathname + '/retrieveMediaCards',
     success: function(data) {
-      console.log('success');
       var mediaCards = JSON.parse(JSON.stringify(data));
-      console.log("numMediaCards = " + mediaCards.length);
       for (var i = 0; i < mediaCards.length; i++) {
-        console.log("mediaCard " + i);
         addScrapedContent(
           mediaCards[i].title,
           mediaCards[i].description,
