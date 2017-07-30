@@ -15,12 +15,11 @@ function addImageToScene(src, position, rotation, link, gif) {
   }
 }
 
-
 document.addEventListener("DOMContentLoaded", function(event) {
 
   //Add all images from database into the scene
   //var images = {};
-  $.ajax({
+  /*$.ajax({
     dataType: 'json',
     url: location.protocol + '//' + location.host + location.pathname + '/retrieveImages',
     success: function(data) {
@@ -30,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         addImageToScene(images[i].src, images[i].position, images[i].rotation, images[i].link, images[i].gif);
       }
     }
-  });
+  });*/
 
   $.ajax({
     dataType: 'json',

@@ -147,7 +147,11 @@ conn.once("open", function(){
   });
 
   app.get('/room/:room', function (req, res) {
-    res.render('index', { roomToJoin: req.params.room })
+    image.find({ room: req.params.room }).exec(function (err, images) {
+      if (err) return console.error(err);
+      //console.log(images);
+      res.render('index', { roomToJoin: req.params.room, imagesToLoad: images})
+    });
   });
 
   var imagesSchema = mongoose.Schema({
