@@ -84,6 +84,9 @@ html
       //a-entity(environment='preset: tron; skyColor: #081d43; fog: 0; gridColor: #026800; groundColor: #655853; groundColor2: #694f45; grid: 1x1; dressingAmount: 30; dressingVariance: 10 10 10; dressingScale: 0; dressingColor: #008000; dressing: trees; lights: none; horizonColor: #0079be; groundYScale: 4.54; seed: 14; ground: spikes')
       //a-entity(environment='preset: tron; dressing: trees; dressingColor: #008000; dressingAmount: 30; dressingVariance: 10 10 10; dressingScale: 5')
       a-assets
+        //load of all the images from the database as assets
+        for image,index in imagesToLoad
+          img(id="image"+index, src=image.src, crossorigin='anonymous')
         img#grid(src='/images/grid.png', crossorigin='anonymous')
         img#sky(src='/images/underwater.jpg', crossorigin='anonymous')
         //a-asset-item#rocketship-obj(src='/models/rocketship/model.obj')
@@ -146,6 +149,13 @@ html
       //a-entity(obj-model='obj: #aclogo-obj; mtl: #aclogo-mtl', scale ='1 1 1', rotation= '-90 180 0', position = '0 9 10')
       a-image#adventurecorp(material='src: url(/images/Adventure_Corporation.png); alphaTest: .001, transparent: true', scale='20 20 20', position='0 7 10', rotation='0 180 0')
       a-image#welcome(material='src: url(/images/welcome0-02.jpg)', scale='15 15 15', position='0 7 -15', rotation='0 0 0')
+      for image,index in imagesToLoad
+        a-image(src='#image'+index,
+          position=image.position.x + " " + image.position.y + " " + image.position.z,
+          rotation=image.rotation.x + " " + image.rotation.y + " " + image.rotation.z,
+          mylink='link: '+image.link,
+          material = image.gif ? 'alphaTest: .001; transparent: true; shader:gif' : 'alphaTest: .001; transparent: true'
+          )
     script.
       // On mobile remove elements that are resource heavy
       var isMobile = AFRAME.utils.device.isMobile();

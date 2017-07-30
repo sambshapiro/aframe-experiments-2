@@ -16,9 +16,13 @@ function useSiteContent(link) {
   console.log("sending link to server: " + link);
   var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
   var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
-  var imgPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y, currentPosition.z+1);
-  var titlePosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y+1, currentPosition.z+1);
-  var descriptionPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y+0.8, currentPosition.z+1);
+
+  var sinx = Math.sin(currentRotation.y * Math.PI / 180.0);
+  var cosx = Math.cos(currentRotation.y * Math.PI / 180.0);
+
+  var imgPosition = new THREE.Vector3(currentPosition.x - sinx, currentPosition.y, currentPosition.z - cosx);
+  var titlePosition = new THREE.Vector3(currentPosition.x - sinx, currentPosition.y+1, currentPosition.z - cosx);
+  var descriptionPosition = new THREE.Vector3(currentPosition.x - sinx, currentPosition.y+0.8, currentPosition.z - cosx);
   var rotation = currentRotation;
   var data = {'link':link, 'imgPosition':imgPosition, 'titlePosition':titlePosition, 'descriptionPosition':descriptionPosition, 'rotation':rotation};
   $.ajax({
