@@ -10,13 +10,13 @@ html
     script(src='/js/lib/socket.io-1.4.5.min.js')
     script(src='/js/lib/aframe-gif-shader.min.js')
     script(src='/js/lib/aframe-gif-component.min.js')
+    script(src='/js/lib/aframe-fit-texture-component.min.js')
     //script(src='/js/lib/aframe-environment-component.min.js')
     script(src='/easyrtc/easyrtc.js')
     script(src='/js/lib/networked-aframe-0.2.1.min.js')
     script(src='/js/lib/aframe-randomizer-components-3.0.2.min.js')
     script(src='/js/lib/aframe-particle-system-component-1.0.5.min.js')
-    script(src='/js/scraped-site-content.js')
-    script(src='/js/loadSceneContent.js')
+    script(src='/js/addSceneContent.js')
     script(src='/js/spawn-in-circle.component.js')
     script(src='/js/link-component.js')
     script(src='/js/savePosition.js')
@@ -87,6 +87,8 @@ html
         //load of all the images from the database as assets
         for image,index in imagesToLoad
           img(id="image"+index, src=image.src, crossorigin='anonymous')
+        for mediaCard,index in mediaCardsToLoad
+          img(id="mediaCardImg"+index, src=mediaCard.src, crossorigin='anonymous')
         img#grid(src='/images/grid.png', crossorigin='anonymous')
         img#sky(src='/images/underwater.jpg', crossorigin='anonymous')
         //a-asset-item#rocketship-obj(src='/models/rocketship/model.obj')
@@ -144,17 +146,50 @@ html
       a-entity(light='color: #ccccff; intensity: 1; type: ambient;', visible='')
       a-entity(light='color: #ffaaff; intensity: 1.5', position='5 5 5')
       a-sky(src='#sky', rotation='0 -90 0')
-      a-entity#particles(particle-system='preset: snow')
+      //a-entity#particles(particle-system='preset: snow')
       //a-entity(obj-model='obj: #rocketship-obj; mtl: #rocketship-mtl', scale ='10 10 10', rotation= '0 180 0', position = '0 5 10')
       //a-entity(obj-model='obj: #aclogo-obj; mtl: #aclogo-mtl', scale ='1 1 1', rotation= '-90 180 0', position = '0 9 10')
       a-image#adventurecorp(material='src: url(/images/Adventure_Corporation.png); alphaTest: .001, transparent: true', scale='20 20 20', position='0 7 10', rotation='0 180 0')
       a-image#welcome(material='src: url(/images/welcome0-02.jpg)', scale='15 15 15', position='0 7 -15', rotation='0 0 0')
       for image,index in imagesToLoad
-        a-image(src='#image'+index,
+        a-image(
+          src='#image'+index,
+          fit-texture,
           position=image.position.x + " " + image.position.y + " " + image.position.z,
           rotation=image.rotation.x + " " + image.rotation.y + " " + image.rotation.z,
           mylink='link: '+image.link,
           material = image.gif ? 'alphaTest: .001; transparent: true; shader:gif' : 'alphaTest: .001; transparent: true'
+          )
+      for mediaCard,index in mediaCardsToLoad
+        a-entity(
+          id='#mediaCard'+index,
+          position=mediaCard.position.x + " " + mediaCard.position.y + " " + mediaCard.position.z,
+          rotation=mediaCard.rotation.x + " " + mediaCard.rotation.y + " " + mediaCard.rotation.z,
+          geometry="primitive: plane; width: 1.2; height: 1.7",
+          material="color: white; side: double",
+          mylink='link: ' + mediaCard.link
+          )
+          a-text(
+            position= "0 .6 0",
+            width= "1.2",
+            value= mediaCard.title,
+            align= "center",
+            color= "black"
+          )
+          a-image(
+            src='#mediaCardImg'+index,
+            fit-texture,
+            position="0 0 .005",
+            rotation="0 0 0",
+            width="1.2"
+          )
+          a-text(
+            position= "-0.540 -0.560 0",
+            value= mediaCard.description,
+            align= "left",
+            width = "1.150",
+            wrapCount= "26.800",
+            color= "black"
           )
     script.
       // On mobile remove elements that are resource heavy
@@ -173,5 +208,5 @@ html
       function mediaCardCallback(senderRtcId, dataType, data) {
       console.log("DATA RECEIVED", senderRtcId, dataType, data);
       var mediaCard = JSON.parse(data);
-      addScrapedContent(mediaCard.title, mediaCard.description, mediaCard.image, mediaCard.link, mediaCard.imgPosition, mediaCard.titlePosition, mediaCard.descriptionPosition, mediaCard.rotation)
+      addScrapedContent(mediaCard.title, mediaCard.description, mediaCard.image, mediaCard.link, mediaCard.position, mediaCard.rotation)
       };

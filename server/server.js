@@ -19,7 +19,7 @@ var mLab = 'mongodb://' + process.env.CONFIGDBHOST + '/' + process.env.CONFIGDBN
 //var MongoClient = mongodb.MongoClient;
 //var collection;
 
-//var fs = require("fs");
+var fs = require("fs");
 var request = require("request");
 var mongoose = require("mongoose");
 mongoose.connect(mLab);
@@ -30,6 +30,8 @@ shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 
 const aws = require('aws-sdk');
 const S3_BUCKET = process.env.S3_BUCKET;
+const s3Stream = require('s3-upload-stream')(new aws.S3());
+var webshot = require('webshot');
 
 // Set process name
 process.title = "node-easyrtc";
@@ -140,6 +142,37 @@ webServer.listen(port, function () {
   console.log('listening on http://localhost:' + port);
 });
 
+//MONGOOSE SCHEMA
+var imagesSchema = mongoose.Schema({
+  room: String,
+  src: String,
+  position: mongoose.Schema.Types.Mixed,
+  rotation: mongoose.Schema.Types.Mixed,
+  link: String,
+  gif: Boolean
+});
+var image = mongoose.model('image', imagesSchema);
+
+var locationSchema = mongoose.Schema({
+  room: String,
+  shortid: String,
+  position: mongoose.Schema.Types.Mixed,
+  rotation: mongoose.Schema.Types.Mixed
+});
+var location = mongoose.model('location', locationSchema);
+
+var mediaCardSchema = mongoose.Schema({
+  room: String,
+  title: String,
+  description: String,
+  src: String,
+  link: String,
+  position: mongoose.Schema.Types.Mixed,
+  rotation: mongoose.Schema.Types.Mixed
+});
+var mediaCard = mongoose.model('mediaCard', mediaCardSchema);
+
+//ROUTES
 conn.once("open", function(){
 
   app.get('/', function (req, res) {
@@ -150,40 +183,12 @@ conn.once("open", function(){
     image.find({ room: req.params.room }).exec(function (err, images) {
       if (err) return console.error(err);
       //console.log(images);
-      res.render('index', { roomToJoin: req.params.room, imagesToLoad: images})
+      mediaCard.find({ room: req.params.room }).exec(function(err,mediaCards) {
+        if (err) return console.error(err);
+        res.render('index', { roomToJoin: req.params.room, imagesToLoad: images, mediaCardsToLoad: mediaCards })
+      });
     });
   });
-
-  var imagesSchema = mongoose.Schema({
-    room: String,
-    src: String,
-    position: mongoose.Schema.Types.Mixed,
-    rotation: mongoose.Schema.Types.Mixed,
-    link: String,
-    gif: Boolean
-  });
-  var image = mongoose.model('image', imagesSchema);
-
-  var locationSchema = mongoose.Schema({
-    room: String,
-    shortid: String,
-    position: mongoose.Schema.Types.Mixed,
-    rotation: mongoose.Schema.Types.Mixed
-  });
-  var location = mongoose.model('location', locationSchema);
-
-  var metadataContentSchema = mongoose.Schema({
-    room: String,
-    title: String,
-    description: String,
-    src: String,
-    link: String,
-    imgPosition: mongoose.Schema.Types.Mixed,
-    titlePosition: mongoose.Schema.Types.Mixed,
-    descriptionPosition: mongoose.Schema.Types.Mixed,
-    rotation: mongoose.Schema.Types.Mixed
-  });
-  var metadataContent = mongoose.model('metadataContent', metadataContentSchema);
 
   app.post("/room/:room/*/imageUpload", function(req, res){
     var newImage = new image({ room: req.params.room, src: req.body.src, position: req.body.position, rotation: req.body.rotation, link: req.body.link, gif: req.body.gif});
@@ -212,6 +217,7 @@ conn.once("open", function(){
       Bucket: S3_BUCKET,
       Key: fileName,
       Expires: 60,
+      StorageClass: "REDUCED_REDUNDANCY",
       ContentType: fileType,
       ACL: 'public-read'
     };
@@ -227,22 +233,6 @@ conn.once("open", function(){
       };
       res.write(JSON.stringify(returnData));
       res.end();
-    });
-  });
-
-  app.get("/room/:room/retrieveImages", function(req, res){
-    image.find({ room: req.params.room }).exec(function (err, images) {
-      if (err) return console.error(err);
-      //console.log(images);
-      res.send(JSON.stringify(images));
-    });
-  });
-
-  app.get("/room/:room/*/retrieveImages", function(req, res){
-    image.find({ room: req.params.room }).exec(function (err, images) {
-      if (err) return console.error(err);
-      //console.log(images);
-      res.send(JSON.stringify(images));
     });
   });
 
@@ -273,16 +263,22 @@ conn.once("open", function(){
       if (err) return console.error(err);
       else if (location != null) {
         if (location.room == req.params.room) {
-          console.log("location.position " + JSON.stringify(location.position));
-          console.log("location.rotation " + JSON.stringify(location.rotation));
-          res.render('index', {
-            roomToJoin: req.params.room,
-            specLocX: location.position.x,
-            specLocY: location.position.y,
-            specLocZ: location.position.z,
-            specRotX: location.rotation.x,
-            specRotY: location.rotation.y,
-            specRotZ: location.rotation.z
+          image.find({ room: req.params.room }).exec(function (err, images) {
+            if (err) return console.error(err);
+            mediaCard.find({ room: req.params.room }).exec(function(err,mediaCards) {
+              if (err) return console.error(err);
+              res.render('index', {
+                roomToJoin: req.params.room,
+                imagesToLoad: images,
+                mediaCardsToLoad: mediaCards,
+                specLocX: location.position.x,
+                specLocY: location.position.y,
+                specLocZ: location.position.z,
+                specRotX: location.rotation.x,
+                specRotY: location.rotation.y,
+                specRotZ: location.rotation.z
+              });
+            });
           });
         }
       }
@@ -293,60 +289,46 @@ conn.once("open", function(){
     });
   });
 
-  app.get("/room/:room/retrieveMediaCards", function(req, res){
-    metadataContent.find({ room: req.params.room }).exec(function (err, mediaCard) {
-      if (err) return console.error(err);
-      //console.log(images);
-      res.send(JSON.stringify(mediaCard));
-    });
-  });
-
-  app.get("/room/:room/*/retrieveMediaCards", function(req, res){
-    metadataContent.find({ room: req.params.room }).exec(function (err, mediaCard) {
-      if (err) return console.error(err);
-      //console.log(images);
-      res.send(JSON.stringify(mediaCard));
-    });
-  });
-
   app.post("/room/:room/metadata", function(req, res){
     urlMetadata(req.body.link, {fromEmail: 'discover@adventure.pizza'}).then(
       function (metadata) { // success handler
         var data = {"title":metadata["og:title"], "description":metadata["og:description"], "image":metadata["og:image"], "link":req.body.link};
-        /*request
-        .get(metadata["og:image"])
+        var fileName = shortid.generate();
+        var upload = s3Stream.upload({
+          Bucket: S3_BUCKET,
+          Key: fileName,
+          ACL: 'public-read',
+          StorageClass: "REDUCED_REDUNDANCY",
+          ContentType: "binary/octet-stream"
+        });
+        var options = {
+          url: data.image,
+          strictSSL: false,
+          secureProtocol: 'TLSv1_method'
+        }
+        request.get(options)
         .on('error', function(err) {
           console.log(err)
         })
-        .pipe(fs.createWriteStream('imageWriteStream'));
-        const s3 = new aws.S3();
-        const fileName = metadata["og:title"].replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const s3Params = {
-          Bucket: S3_BUCKET,
-          Key: fileName,
-          Body: imageWriteStream,
-          ACL: 'public-read'
-        };
-        s3.upload(params, function(err, data) {
-          console.log(err, data);
-        });*/
-
-        var savedMetadata = new metadataContent({
-          room: req.params.room,
-          title: data.title,
-          description: data.description,
-          src: data.image,
-          link: req.body.link,
-          imgPosition: req.body.imgPosition,
-          titlePosition: req.body.titlePosition,
-          descriptionPosition: req.body.descriptionPosition,
-          rotation: req.body.rotation
+        .pipe(upload);
+        upload.on('uploaded', function (details) {
+          data.image = "https://s3.amazonaws.com/" + S3_BUCKET + "/" + fileName;
+          var savedMediaCard = new mediaCard({
+            room: req.params.room,
+            title: data.title,
+            description: data.description,
+            src: data.image,
+            link: req.body.link,
+            position: req.body.position,
+            rotation: req.body.rotation
+          });
+          savedMediaCard.save(function (err, savedMediaCard) {
+            if (err) return console.error(err);
+            console.log("media card successfully added to database");
+          });
+          data.image = savedMediaCard.src;
+          res.send(data);
         });
-        savedMetadata.save(function (err, savedMetadata) {
-          if (err) return console.error(err);
-          console.log("metadata successfully added to database");
-        });
-        res.send(data);
       },
       function (error) { // failure handler
         console.log(error)
@@ -357,22 +339,42 @@ conn.once("open", function(){
       urlMetadata(req.body.link, {fromEmail: 'discover@adventure.pizza'}).then(
         function (metadata) { // success handler
           var data = {"title":metadata["og:title"], "description":metadata["og:description"], "image":metadata["og:image"], "link":req.body.link};
-          var savedMetadata = new metadataContent({
-            room: req.params.room,
-            title: data.title,
-            description: data.description,
-            src: data.image,
-            link: req.body.link,
-            imgPosition: req.body.imgPosition,
-            titlePosition: req.body.titlePosition,
-            descriptionPosition: req.body.descriptionPosition,
-            rotation: req.body.rotation
+          var fileName = shortid.generate();
+          var upload = s3Stream.upload({
+            Bucket: S3_BUCKET,
+            Key: fileName,
+            ACL: 'public-read',
+            StorageClass: "REDUCED_REDUNDANCY",
+            ContentType: "binary/octet-stream"
           });
-          savedMetadata.save(function (err, savedMetadata) {
-            if (err) return console.error(err);
-            console.log("metadata successfully added to database");
+          var options = {
+            url: data.image,
+            strictSSL: false,
+            secureProtocol: 'TLSv1_method'
+          }
+          request.get(options)
+          .on('error', function(err) {
+            console.log(err)
+          })
+          .pipe(upload);
+          upload.on('uploaded', function (details) {
+            data.image = "https://s3.amazonaws.com/" + S3_BUCKET + "/" + fileName;
+            var savedMediaCard = new mediaCard({
+              room: req.params.room,
+              title: data.title,
+              description: data.description,
+              src: data.image,
+              link: req.body.link,
+              position: req.body.position,
+              rotation: req.body.rotation
+            });
+            savedMediaCard.save(function (err, savedMediaCard) {
+              if (err) return console.error(err);
+              console.log("media card successfully added to database");
+            });
+            data.image = savedMediaCard.src;
+            res.send(data);
           });
-          res.send(data);
         },
         function (error) { // failure handler
           console.log(error)

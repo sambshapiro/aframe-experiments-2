@@ -17,14 +17,13 @@ function useSiteContent(link) {
   var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
   var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
 
-  var sinx = Math.sin(currentRotation.y * Math.PI / 180.0);
-  var cosx = Math.cos(currentRotation.y * Math.PI / 180.0);
+  var siny = Math.sin(currentRotation.y * Math.PI / 180.0);
+  var cosy = Math.cos(currentRotation.y * Math.PI / 180.0);
+  var sinx = Math.sin(currentRotation.x * Math.PI / 180.0);
 
-  var imgPosition = new THREE.Vector3(currentPosition.x - sinx, currentPosition.y, currentPosition.z - cosx);
-  var titlePosition = new THREE.Vector3(currentPosition.x - sinx, currentPosition.y+1, currentPosition.z - cosx);
-  var descriptionPosition = new THREE.Vector3(currentPosition.x - sinx, currentPosition.y+0.8, currentPosition.z - cosx);
+  var position = new THREE.Vector3(currentPosition.x - siny, currentPosition.y+sinx, currentPosition.z - cosy);
   var rotation = currentRotation;
-  var data = {'link':link, 'imgPosition':imgPosition, 'titlePosition':titlePosition, 'descriptionPosition':descriptionPosition, 'rotation':rotation};
+  var data = {'link':link, 'position':position, 'rotation':rotation};
   $.ajax({
     type: 'POST',
     data: JSON.stringify(data),
@@ -32,9 +31,9 @@ function useSiteContent(link) {
     url: location.protocol + '//' + location.host + location.pathname + '/metadata',
     success: function(data) {
       console.log('successly received scraped content from server');
-      addScrapedContent(data.title, data.description, data.image, data.link, imgPosition, titlePosition, descriptionPosition, rotation);
+      addScrapedContent(data.title, data.description, data.image, data.link, position, rotation);
       console.log("broadcasting data");
-      var broadcastData = {'title':data.title, 'description':data.description, 'image':data.image, 'link':link, 'imgPosition':imgPosition, 'titlePosition':titlePosition, 'descriptionPosition':descriptionPosition, 'rotation':rotation};
+      var broadcastData = {'title':data.title, 'description':data.description, 'image':data.image, 'link':link, 'position':position, 'rotation':rotation};
       NAF.connection.broadcastDataGuaranteed('mediaCardPlaced', JSON.stringify(broadcastData));
     }
   });
@@ -83,7 +82,10 @@ function mediaLoader(link) {
   $("#link_input_div").hide();
   var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
   var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
-  var setPosition = new THREE.Vector3(currentPosition.x+1, currentPosition.y, currentPosition.z+1);
+  var siny = Math.sin(currentRotation.y * Math.PI / 180.0);
+  var cosy = Math.cos(currentRotation.y * Math.PI / 180.0);
+  var sinx = Math.sin(currentRotation.x * Math.PI / 180.0);
+  var setPosition = new THREE.Vector3(currentPosition.x - siny, currentPosition.y + sinx, currentPosition.z - cosy);
   var setRotation = currentRotation;
 
   //var files = document.getElementById("media_input").files;
