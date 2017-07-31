@@ -9,6 +9,7 @@ function addImageToScene(src, position, rotation, link, gif) {
   entityEl.setAttribute('material', 'src', 'url(' + src + ')');
   entityEl.setAttribute('material', 'alphaTest', .001);
   entityEl.setAttribute('material', 'transparent', true);
+  entityEl.setAttribute('fit-texture','');
   entityEl.setAttribute('mylink', 'link', link);
   if (gif) {
     entityEl.setAttribute('material', 'shader', 'gif');
@@ -24,19 +25,19 @@ function addScrapedContent(title, description, src, link, position, rotation) {
     containerEl.setAttribute('geometry', 'primitive', 'plane');
     containerEl.setAttribute('geometry', 'width', 1.2);
     containerEl.setAttribute('geometry', 'height', 1.7);
-    containerEl.setAttribute('material', 'color', new THREE.Color(Math.random(), Math.random(), Math.random()));
+    containerEl.setAttribute('material', 'color', 'white');
     containerEl.setAttribute('material', 'side', 'double');
     containerEl.setAttribute('mylink', 'link', link);
 
     //generate image
     var imageEl = document.createElement('a-image');
-    imageEl.setAttribute('position','0 0 .002');
+    imageEl.setAttribute('position','0 0 .005');
     imageEl.setAttribute('rotation','0 0 0');
     imageEl.setAttribute('fit-texture','');
     imageEl.setAttribute('width', 1.2);
     imageEl.setAttribute('material', 'src', 'url(' + src + ')');
-    imageEl.setAttribute('material', 'alphaTest', .001);
-    imageEl.setAttribute('material', 'transparent', true);
+    //imageEl.setAttribute('material', 'alphaTest', .001);
+    //imageEl.setAttribute('material', 'transparent', true);
 
     //generate title
     var titleEl = document.createElement('a-text');
@@ -44,7 +45,7 @@ function addScrapedContent(title, description, src, link, position, rotation) {
     titleEl.setAttribute('rotation','0 0 0');
     titleEl.setAttribute('align','center');
     titleEl.setAttribute('value',title);
-    titleEl.setAttribute('color','white');
+    titleEl.setAttribute('color','black');
 
     //generate description
     var descriptionEl = document.createElement('a-text');
@@ -54,7 +55,7 @@ function addScrapedContent(title, description, src, link, position, rotation) {
     descriptionEl.setAttribute('wrapCount',26.800);
     descriptionEl.setAttribute('align','left');
     descriptionEl.setAttribute('value',description);
-    descriptionEl.setAttribute('color','white');
+    descriptionEl.setAttribute('color','black');
 
     containerEl.appendChild(imageEl);
     containerEl.appendChild(titleEl);

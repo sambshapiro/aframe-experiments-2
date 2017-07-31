@@ -166,20 +166,21 @@ html
           position=mediaCard.position.x + " " + mediaCard.position.y + " " + mediaCard.position.z,
           rotation=mediaCard.rotation.x + " " + mediaCard.rotation.y + " " + mediaCard.rotation.z,
           geometry="primitive: plane; width: 1.2; height: 1.7",
-          material="color: green; side: double",
+          material="color: white; side: double",
           mylink='link: ' + mediaCard.link
           )
           a-text(
             position= "0 .6 0",
+            width= "1.2",
             value= mediaCard.title,
-            align= "center"
+            align= "center",
+            color= "black"
           )
           a-image(
             src='#mediaCardImg'+index,
             fit-texture,
-            position="0 0 .002",
+            position="0 0 .005",
             rotation="0 0 0",
-            material = 'alphaTest: .001; transparent: true'
             width="1.2"
           )
           a-text(
@@ -187,7 +188,8 @@ html
             value= mediaCard.description,
             align= "left",
             width = "1.150",
-            wrapCount= "26.800"
+            wrapCount= "26.800",
+            color= "black"
           )
     script.
       // On mobile remove elements that are resource heavy
