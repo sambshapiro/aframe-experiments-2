@@ -265,17 +265,19 @@ conn.once("open", function(){
         if (location.room == req.params.room) {
           image.find({ room: req.params.room }).exec(function (err, images) {
             if (err) return console.error(err);
-            console.log("location.position " + JSON.stringify(location.position));
-            console.log("location.rotation " + JSON.stringify(location.rotation));
-            res.render('index', {
-              roomToJoin: req.params.room,
-              imagesToLoad: images,
-              specLocX: location.position.x,
-              specLocY: location.position.y,
-              specLocZ: location.position.z,
-              specRotX: location.rotation.x,
-              specRotY: location.rotation.y,
-              specRotZ: location.rotation.z
+            mediaCard.find({ room: req.params.room }).exec(function(err,mediaCards) {
+              if (err) return console.error(err);
+              res.render('index', {
+                roomToJoin: req.params.room,
+                imagesToLoad: images,
+                mediaCardsToLoad: mediaCards,
+                specLocX: location.position.x,
+                specLocY: location.position.y,
+                specLocZ: location.position.z,
+                specRotX: location.rotation.x,
+                specRotY: location.rotation.y,
+                specRotZ: location.rotation.z
+              });
             });
           });
         }
@@ -337,13 +339,7 @@ conn.once("open", function(){
       urlMetadata(req.body.link, {fromEmail: 'discover@adventure.pizza'}).then(
         function (metadata) { // success handler
           var data = {"title":metadata["og:title"], "description":metadata["og:description"], "image":metadata["og:image"], "link":req.body.link};
-          var fileName;
-          if (data.title != "") {
-            fileName = (data.title).replace(/[^a-z0-9]/gi, '_').toLowerCase();
-          }
-          else {
-            fileName = shortid.generate();
-          }
+          var fileName = shortid.generate();
           var upload = s3Stream.upload({
             Bucket: S3_BUCKET,
             Key: fileName,
@@ -351,7 +347,16 @@ conn.once("open", function(){
             StorageClass: "REDUCED_REDUNDANCY",
             ContentType: "binary/octet-stream"
           });
-          request(data.image).pipe(upload);
+          var options = {
+            url: data.image,
+            strictSSL: false,
+            secureProtocol: 'TLSv1_method'
+          }
+          request.get(options)
+          .on('error', function(err) {
+            console.log(err)
+          })
+          .pipe(upload);
           upload.on('uploaded', function (details) {
             data.image = "https://s3.amazonaws.com/" + S3_BUCKET + "/" + fileName;
             var savedMediaCard = new mediaCard({
