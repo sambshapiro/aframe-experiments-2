@@ -14,15 +14,10 @@ function uploadMedia() {
 
 function useSiteContent(link) {
   console.log("sending link to server: " + link);
-  var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
-  var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
+  var placementCoords = getPlacementPosition();
+  var position = placementCoords.position;
+  var rotation = placementCoords.rotation;
 
-  var siny = Math.sin(currentRotation.y * Math.PI / 180.0);
-  var cosy = Math.cos(currentRotation.y * Math.PI / 180.0);
-  var sinx = Math.sin(currentRotation.x * Math.PI / 180.0);
-
-  var position = new THREE.Vector3(currentPosition.x - siny, currentPosition.y+sinx, currentPosition.z - cosy);
-  var rotation = currentRotation;
   var data = {'link':link, 'position':position, 'rotation':rotation};
   $.ajax({
     type: 'POST',
@@ -71,22 +66,38 @@ function checkLink(callback) {
     document.getElementById("search-box").style.backgroundColor = "rgba(255,255,255,.5)";
   }
   else {
-    el.value = "Invalid URL.";
+    console.log("not a valid url; posting as message instead");
+
+    var placementCoords = getPlacementPosition();
+    var position = placementCoords.position;
+    var rotation = placementCoords.rotation;
+
+    addMessageToScene(el.value, position, rotation);
+    var data = {message: el.value, position: position, rotation: rotation};
+    el.value = "";
+
+    NAF.connection.broadcastDataGuaranteed('messagePosted', JSON.stringify(data));
+
+    $.ajax({
+      type: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'application/json',
+      url: location.protocol + '//' + location.host + location.pathname + '/messagePosted',
+      success: function(data) {
+      }
+    });
+    /*el.value = "Invalid URL.";
     if ( callback == useSiteContent ) {
       document.getElementById("search-box").style.backgroundColor = "rgba(255,0,0,.5)";
-    }
+    }*/
   }
 }
 
 function mediaLoader(link) {
   $("#link_input_div").hide();
-  var currentPosition = document.querySelector('a-scene').querySelector('#player').getAttribute('position');
-  var currentRotation = document.querySelector('a-scene').querySelector('#player').getAttribute('rotation');
-  var siny = Math.sin(currentRotation.y * Math.PI / 180.0);
-  var cosy = Math.cos(currentRotation.y * Math.PI / 180.0);
-  var sinx = Math.sin(currentRotation.x * Math.PI / 180.0);
-  var setPosition = new THREE.Vector3(currentPosition.x - siny, currentPosition.y + sinx, currentPosition.z - cosy);
-  var setRotation = currentRotation;
+  var placementCoords = getPlacementPosition();
+  var position = placementCoords.position;
+  var rotation = placementCoords.rotation;
 
   //var files = document.getElementById("media_input").files;
   var file = document.getElementById("media_input").files[0];
@@ -98,9 +109,9 @@ function mediaLoader(link) {
 
     if (filetype.includes('image')){
       //adds image to scene for yourself
-      addImageToScene(reader.result, setPosition, setRotation, link, filetype == 'image/gif');
+      addImageToScene(reader.result, position, rotation, link, filetype == 'image/gif');
 
-      var data = { src: reader.result, position: setPosition, rotation: setRotation, link: link, gif: filetype == 'image/gif'};
+      var data = { src: reader.result, position: position, rotation: rotation, link: link, gif: filetype == 'image/gif'};
       console.log("broadcasting data");
       //adds image to scene for others in room NOW
       NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));

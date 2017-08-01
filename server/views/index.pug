@@ -65,7 +65,7 @@ html
       input#enterRoomName.link_btns(type='text', placeholder='Room to Add', name='roomToAdd', required='')
       button.link_btns(onclick='addRoom()') Add Room
     div.searchform.group
-      input#search-box(type='search', placeholder='Paste a URL here')
+      input#search-box(type='search', placeholder='Paste a URL here or type a message to others')
       button#goButton(name='Go', onclick='checkLink(useSiteContent)') Go
     #menu_div
       button#add_room_button.menu_btn.exp(name='Add Room', onclick='addRoomButton()')
@@ -160,6 +160,14 @@ html
           mylink='link: '+image.link,
           material = image.gif ? 'alphaTest: .001; transparent: true; shader:gif' : 'alphaTest: .001; transparent: true'
           )
+      for message,index in messagesToLoad
+        a-entity(
+          position=message.position.x + " " + message.position.y + " " + message.position.z,
+          rotation=message.rotation.x + " " + message.rotation.y + " " + message.rotation.z,
+          geometry="primitive: plane; width: auto; height: auto",
+          material="color: white; side: double",
+          text="align: center; color: black; side: double; value: " + message.message
+          )
       for mediaCard,index in mediaCardsToLoad
         a-entity(
           id='#mediaCard'+index,
@@ -195,18 +203,24 @@ html
       // On mobile remove elements that are resource heavy
       var isMobile = AFRAME.utils.device.isMobile();
       if (isMobile) {
-      var particles = document.getElementById('particles');
-      particles.parentNode.removeChild(particles);
+        var particles = document.getElementById('particles');
+        particles.parentNode.removeChild(particles);
       }
       NAF.connection.subscribeToDataChannel('imagePlaced', avatarCallback);
       function avatarCallback(senderRtcId, dataType, data) {
-      console.log("DATA RECEIVED", senderRtcId, dataType, data);
-      var image = JSON.parse(data);
-      addImageToScene(image.src, image.position, image.rotation, image.link, image.gif);
+        console.log("DATA RECEIVED", senderRtcId, dataType, data);
+        var image = JSON.parse(data);
+        addImageToScene(image.src, image.position, image.rotation, image.link, image.gif);
       };
       NAF.connection.subscribeToDataChannel('mediaCardPlaced', mediaCardCallback);
       function mediaCardCallback(senderRtcId, dataType, data) {
-      console.log("DATA RECEIVED", senderRtcId, dataType, data);
-      var mediaCard = JSON.parse(data);
-      addScrapedContent(mediaCard.title, mediaCard.description, mediaCard.image, mediaCard.link, mediaCard.position, mediaCard.rotation)
+        console.log("DATA RECEIVED", senderRtcId, dataType, data);
+        var mediaCard = JSON.parse(data);
+        addScrapedContent(mediaCard.title, mediaCard.description, mediaCard.image, mediaCard.link, mediaCard.position, mediaCard.rotation)
+      };
+      NAF.connection.subscribeToDataChannel('messagePosted', messagePostedCallback);
+      function messagePostedCallback(senderRtcId, dataType, data) {
+        console.log("DATA RECEIVED", senderRtcId, dataType, data);
+        var data = JSON.parse(data);
+        addMessageToScene(data.message, data.position, data.rotation);
       };
