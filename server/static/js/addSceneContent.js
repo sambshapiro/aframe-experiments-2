@@ -59,6 +59,7 @@ function addScrapedContent(title, description, src, link, position, rotation) {
     var titleEl = document.createElement('a-text');
     titleEl.setAttribute('position','0 .6 0');
     titleEl.setAttribute('rotation','0 0 0');
+    titleEl.setAttribute('width',1.150);
     titleEl.setAttribute('align','center');
     titleEl.setAttribute('value',title);
     titleEl.setAttribute('color','black');
