@@ -153,6 +153,14 @@ var imagesSchema = mongoose.Schema({
 });
 var image = mongoose.model('image', imagesSchema);
 
+var messageSchema = mongoose.Schema({
+  room: String,
+  message: String,
+  position: mongoose.Schema.Types.Mixed,
+  rotation: mongoose.Schema.Types.Mixed
+});
+var message = mongoose.model('message', messageSchema);
+
 var locationSchema = mongoose.Schema({
   room: String,
   shortid: String,
@@ -182,12 +190,32 @@ conn.once("open", function(){
   app.get('/room/:room', function (req, res) {
     image.find({ room: req.params.room }).exec(function (err, images) {
       if (err) return console.error(err);
-      //console.log(images);
       mediaCard.find({ room: req.params.room }).exec(function(err,mediaCards) {
         if (err) return console.error(err);
-        res.render('index', { roomToJoin: req.params.room, imagesToLoad: images, mediaCardsToLoad: mediaCards })
+        message.find({ room: req.params.room }).exec(function(err,messages) {
+          if (err) return console.error(err);
+          res.render('index', { roomToJoin: req.params.room, imagesToLoad: images, mediaCardsToLoad: mediaCards, messagesToLoad: messages })
+        });
       });
     });
+  });
+
+  app.post("/room/:room/*/messagePosted", function(req, res){
+    var newMessage = new message({ room: req.params.room, message: req.body.message, position: req.body.position, rotation: req.body.rotation});
+    newMessage.save(function (err, newMessage) {
+      if (err) return console.error(err);
+      console.log("message successfully added to database");
+    });
+    res.end();
+  });
+
+  app.post("/room/:room/messagePosted", function(req, res){
+    var newMessage = new message({ room: req.params.room, message: req.body.message, position: req.body.position, rotation: req.body.rotation});
+    newMessage.save(function (err, newMessage) {
+      if (err) return console.error(err);
+      console.log("message successfully added to database");
+    });
+    res.end();
   });
 
   app.post("/room/:room/*/imageUpload", function(req, res){
@@ -267,16 +295,20 @@ conn.once("open", function(){
             if (err) return console.error(err);
             mediaCard.find({ room: req.params.room }).exec(function(err,mediaCards) {
               if (err) return console.error(err);
-              res.render('index', {
-                roomToJoin: req.params.room,
-                imagesToLoad: images,
-                mediaCardsToLoad: mediaCards,
-                specLocX: location.position.x,
-                specLocY: location.position.y,
-                specLocZ: location.position.z,
-                specRotX: location.rotation.x,
-                specRotY: location.rotation.y,
-                specRotZ: location.rotation.z
+              message.find({ room: req.params.room }).exec(function(err,messages) {
+                if (err) return console.error(err);
+                res.render('index', {
+                  roomToJoin: req.params.room,
+                  imagesToLoad: images,
+                  messagesToLoad: messages,
+                  mediaCardsToLoad: mediaCards,
+                  specLocX: location.position.x,
+                  specLocY: location.position.y,
+                  specLocZ: location.position.z,
+                  specRotX: location.rotation.x,
+                  specRotY: location.rotation.y,
+                  specRotZ: location.rotation.z
+                });
               });
             });
           });
