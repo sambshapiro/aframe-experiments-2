@@ -74,7 +74,7 @@ function checkLink(callback) {
 
     addMessageToScene(el.value, position, rotation);
     var data = {message: el.value, position: position, rotation: rotation};
-    el.value = "Paste a URL here or type a message to others";
+    el.value = "";
 
     NAF.connection.broadcastDataGuaranteed('messagePosted', JSON.stringify(data));
 
