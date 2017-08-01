@@ -13,7 +13,7 @@ html
     script(src='/js/lib/aframe-fit-texture-component.min.js')
     //script(src='/js/lib/aframe-environment-component.min.js')
     script(src='/easyrtc/easyrtc.js')
-    script(src='/js/lib/networked-aframe-0.2.1.min.js')
+    script(src='/js/lib/networked-aframe-0.2.3.min.js')
     script(src='/js/lib/aframe-randomizer-components-3.0.2.min.js')
     script(src='/js/lib/aframe-particle-system-component-1.0.5.min.js')
     script(src='/js/addSceneContent.js')
@@ -150,7 +150,7 @@ html
       //a-entity(obj-model='obj: #rocketship-obj; mtl: #rocketship-mtl', scale ='10 10 10', rotation= '0 180 0', position = '0 5 10')
       //a-entity(obj-model='obj: #aclogo-obj; mtl: #aclogo-mtl', scale ='1 1 1', rotation= '-90 180 0', position = '0 9 10')
       a-image#adventurecorp(material='src: url(/images/Adventure_Corporation.png); alphaTest: .001, transparent: true', scale='20 20 20', position='0 7 10', rotation='0 180 0')
-      a-image#welcome(material='src: url(/images/welcome0-02.jpg)', scale='15 15 15', position='0 7 -15', rotation='0 0 0')
+      //a-image#welcome(material='src: url(/images/welcome0-02.jpg)', scale='15 15 15', position='0 7 -15', rotation='0 0 0')
       for image,index in imagesToLoad
         a-image(
           src='#image'+index,
