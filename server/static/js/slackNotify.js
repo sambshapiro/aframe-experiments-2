@@ -2,6 +2,8 @@ slackNotify();
 
 function slackNotify() {
 
+	var randColors = ['#'+Math.floor(Math.random()*16777215).toString(16), '#'+Math.floor(Math.random()*16777215).toString(16)];
+
 	$.getJSON('http://www.geoplugin.net/json.gp?jsoncallback=?', function(data) {
   		var user_location = "from " + data.geoplugin_regionCode + ", " + data.geoplugin_regionName;
 		var message = "*someone just entered room:* <" + window.location.protocol + "//" + window.location.host + location.pathname + ">";
@@ -10,7 +12,9 @@ function slackNotify() {
 		    "mrkdwn": true,
 		    "attachments": [
 		        {
-		            "text": user_location
+		        	"color":randColors[0],
+		            "text": user_location,
+		            "footer": data.geoplugin_request
 				}
 			]
 		};
