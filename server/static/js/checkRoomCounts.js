@@ -14,6 +14,42 @@ function checkRoomCount() {
   xhr.send();
 }
 
+function toggleTheSidebar() {
+  //if not closed, close it
+  if ($( "#sidebar" ).data("closed") != true) {
+    $( "#openRoomsHeading").hide();
+    $( "#roomTable").hide();
+    $( "#sidebar" ).animate({
+      width: "3vw",
+    }, 1000, function() {
+      // Animation complete.
+      $( "#sidebar" ).data("closed",true);
+    });
+  }
+  //if closed, open it
+  else {
+    //if on mobile
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+     $( "#sidebar" ).animate({
+        width: "70vw",
+      }, 1000, function() {
+        $( "#openRoomsHeading").show();
+        $( "#roomTable").show();
+        $( "#sidebar" ).data("closed",false);
+      });
+    }
+    else {
+      $( "#sidebar" ).animate({
+        width: "30vw",
+      }, 1000, function() {
+        $( "#openRoomsHeading").show();
+        $( "#roomTable").show();
+        $( "#sidebar" ).data("closed",false);
+      });
+    }
+  }
+};
+
 setInterval(checkRoomCount, 10000);
 
 function updateRoomCounts(data) {
@@ -30,8 +66,10 @@ function updateRoomCounts(data) {
 
     var colRoomName = document.createElement("th");
     colRoomName.className = "roomName";
-    var textnodeColRoomName = document.createTextNode(data.roomNames[i]);
-    colRoomName.appendChild(textnodeColRoomName);
+    var a = document.createElement('a');
+    a.href =  data.roomNames[i];
+    a.innerHTML = data.roomNames[i];
+    colRoomName.appendChild(a);
 
     var colNumUsers = document.createElement("th");
     colNumUsers.className = "numUsers";

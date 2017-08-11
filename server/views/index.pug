@@ -57,11 +57,13 @@ html
       NAF.schemas.add(avatarSchema);
   body
     div#sidebar
-      h1 Open Rooms
+      h1(id="openRoomsHeading") Open Rooms
+      img#toggleSidebar(src='/ui/icons/double-arrow.png', onclick='toggleTheSidebar()')
       table.roomTable(id="roomTable")
         for room,index in roomsToShow
           tr.roomTableRow
-            th.roomName #{room.roomName}
+            th.roomName
+              a(href=room.roomName) #{room.roomName}
             th.numUsers #{room.numUsers}
     img#avatar-hud(src='/images/gradient.png')
     #link_input_div
