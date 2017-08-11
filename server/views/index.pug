@@ -13,7 +13,7 @@ html
     script(src='/js/lib/aframe-fit-texture-component.min.js')
     //script(src='/js/lib/aframe-environment-component.min.js')
     script(src='/easyrtc/easyrtc.js')
-    script(src='/js/lib/networked-aframe-0.2.3.min.js')
+    script(src='/js/lib/networked-aframe-0.2.3-roomLeave.min.js')
     script(src='/js/lib/aframe-randomizer-components-3.0.2.min.js')
     script(src='/js/lib/aframe-particle-system-component-1.0.5.min.js')
     script(src='/js/addSceneContent.js')
@@ -27,6 +27,7 @@ html
     script(src='/js/aframe-extras.min.js')
     script(src='/js/slackNotify.js')
     script(src='/js/close-windows.js')
+    script(src='/js/checkRoomCounts.js')
     if specLocX
       script.
         specLocX = #{specLocX};
@@ -55,6 +56,15 @@ html
       };
       NAF.schemas.add(avatarSchema);
   body
+    div#sidebar
+      h1(id="openRoomsHeading") Open Rooms
+      img#toggleSidebar(src='/ui/icons/double-arrow.png', onclick='toggleTheSidebar()')
+      table.roomTable(id="roomTable")
+        for room,index in roomsToShow
+          tr.roomTableRow
+            th.roomName
+              a(href=room.roomName) #{room.roomName}
+            th.numUsers #{room.numUsers}
     img#avatar-hud(src='/images/gradient.png')
     #link_input_div
       p#media_input_p.p_input

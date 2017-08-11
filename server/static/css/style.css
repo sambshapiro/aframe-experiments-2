@@ -21,6 +21,11 @@
     width: 45px;
   }
 
+  #sidebar {
+    width: 70vw;
+    bottom: 15em;
+  }
+
 }
 
 /*Desktop*/
@@ -44,6 +49,11 @@
 
   button.menu_btn{
     width: 64px;
+  }
+
+  #sidebar {
+    width: 30vw;
+    bottom: 15em;
   }
 
 }
@@ -143,6 +153,50 @@ p.p_input{
 #cancel_icon{
   width: 12px;
   margin:auto;
+}
+
+#sidebar {
+  background-color: rgba(255,255,255,.5);
+  position: absolute;
+  top: 3em;
+  right: -1em;
+  z-index: 3;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-width: 1px 1px 1px;
+  border-radius: 10px;
+  overflow-y: auto;
+}
+
+#sidebar h1 {
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  color: black;
+}
+
+#toggleSidebar {
+  width: 30px;
+  margin-left: -15px;
+  top: 100px;
+  position: absolute;
+}
+
+.roomTable {
+  padding-left: 3em;
+  padding-right: 3em;
+  width: 100%;
+}
+
+.roomName {
+  font-family: 'Roboto', sans-serif;
+  color: black;
+  width: 50%;
+}
+
+.numUsers {
+  font-family: 'Roboto', sans-serif;
+  color: black;
+  width: 50%;
 }
 
 /*

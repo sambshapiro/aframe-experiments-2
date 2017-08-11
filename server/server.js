@@ -7,11 +7,6 @@ var socketIo = require("socket.io");        // web socket external module
 var easyrtc = require("easyrtc");           // EasyRTC external module
 var pug = require('pug');
 var urlMetadata = require('url-metadata');
-//var slack = require('slack-incoming-webhook');
-//var send = slack({url: '{https://hooks.slack.com/services/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}'});
-//send({"text": "hello"});
-//var request = require('request-promise');
-//const  {SCOPE, TOKEN, CLIENT_ID, CLIENT_SECRET} = process.env;
 
 //var mongodb = require('mongodb');
 //var config = require('../server/config');
@@ -46,37 +41,6 @@ app.use(serveStatic('server/static', {'index': ['index.html']}));
 app.use(express.static('static'));
 app.set('view engine', 'pug');
 app.set('views', './server/views');
-/*app.use('/slack', slack({
-scope: 'bot,commands,incoming-webhook',
-token: 'fbXTXSVnA5kP72Zgv3vCqsuK',
-store: 'data/team.json',
-client_id: '215025528775.215697609975',
-client_secret: '68f547f14d8d24b90e11061ca514437e'
-}));
-// handle the "/test" slash commands
-slack.on('/test', (payload, bot) => {
-console.log("/test command received");
-bot.reply('hi adventure corp!');
-});*/
-/*var options = {
-method: 'POST',
-uri: 'https://hooks.slack.com/services/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',
-form: {
-text: 'A message\non several\nlines.',
-},
-headers: {
-'content-type': 'application/json'
-}
-};
-request(options)
-.then(function (body) {
-console.log("slack " + body);
-// Display response content
-})
-.catch(function (err) {
-// Display errors if any
-console.log("slack " + err);
-});*/
 
 // Start Express http server
 var webServer = http.createServer(app).listen(port);
@@ -120,12 +84,6 @@ easyrtc.events.on("easyrtcAuth", function(socket, easyrtcid, msg, socketCallback
   });
 });
 
-// To test, lets print the credential to the console for every room join!
-easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, callback) {
-  console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
-  easyrtc.events.defaultListeners.roomJoin(connectionObj, roomName, roomParameter, callback);
-});
-
 // Start EasyRTC server
 var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
   console.log("Initiated");
@@ -143,6 +101,13 @@ webServer.listen(port, function () {
 });
 
 //MONGOOSE SCHEMA
+var roomSchema = mongoose.Schema({
+  roomName: String,
+  users: [String],
+  numUsers: Number
+});
+var room = mongoose.model('room', roomSchema);
+
 var imagesSchema = mongoose.Schema({
   room: String,
   src: String,
@@ -182,6 +147,73 @@ var mediaCard = mongoose.model('mediaCard', mediaCardSchema);
 
 //ROUTES
 conn.once("open", function(){
+  
+  //when someone enters a room, keep a record of it in database
+  easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, callback) {
+    console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
+    easyrtc.events.defaultListeners.roomJoin(connectionObj, roomName, roomParameter, callback);
+    console.log("someone joined room " + roomName + " with ID " + connectionObj.getEasyrtcid());
+    connectionObj.getApp().getRoomOccupantCount(roomName, function(err,clientCount) {
+      console.log("room count is now " + clientCount);
+    });
+    room.find({ roomName: roomName }).exec(function (err, room_found) {
+      if (err) return console.error(err);
+      //if room does not exist (has never been created before)
+      if (room_found.length == 0) {
+        console.log("room doesn't exist; adding it")
+        var newRoom = new room({ roomName: roomName, users: [connectionObj.getEasyrtcid()], numUsers: 1 });
+        newRoom.save(function (err, newRoom) {
+          if (err) return console.error(err);
+          console.log(newRoom);
+        });
+      }
+      //if room exists
+      else {
+        room_found[0].users.push(connectionObj.getEasyrtcid());
+        room_found[0].numUsers += 1;
+        room_found[0].save(function(err, updatedRoom) {
+          console.log(updatedRoom);
+        });
+      }
+    });
+  });
+
+  //when someone leaves a room, keep a record of it in database
+  easyrtc.events.on("roomLeave", function(connectionObj, roomName, roomParameter, callback) {
+    console.log("["+connectionObj.getEasyrtcid()+"] JUST LEFT ROOM " + roomName);
+    easyrtc.events.defaultListeners.roomLeave(connectionObj, roomName, roomParameter, callback);
+    room.find({ roomName: roomName }).exec(function (err, room_found) {
+      if (err) return console.error(err);
+      //if room does not exist... some error function
+      if (room_found.length == 0) {
+        console.log("ERROR someone left a room that doesn't exist")
+      }
+      //if room exists
+      else {
+        var index = room_found[0].users.indexOf(connectionObj.getEasyrtcid());
+        room_found[0].users.splice(index, 1);
+        room_found[0].numUsers -= 1;
+        room_found[0].save(function(err, updatedRoom) {
+          console.log(updatedRoom);
+        });
+      }
+    });
+  });
+
+  app.get('/roomCountData', function (req, res) {
+    var data = { "roomNames": [], "roomCounts": [] };
+    room.
+      find( { numUsers: { $gt: 0 } } ).
+      sort({ numUsers: -1 }).
+      select({ _id: 0, roomName: 1, numUsers: 1 }).
+      exec(function(err, rooms) {
+        for (var i = 0; i < rooms.length; i++) {
+          data.roomNames.push(rooms[i].roomName);
+          data.roomCounts.push(rooms[i].numUsers);
+        }
+        res.send(data);
+      });
+  });
 
   app.get('/', function (req, res) {
     res.redirect('/room/home');
@@ -194,7 +226,13 @@ conn.once("open", function(){
         if (err) return console.error(err);
         message.find({ room: req.params.room }).exec(function(err,messages) {
           if (err) return console.error(err);
-          res.render('index', { roomToJoin: req.params.room, imagesToLoad: images, mediaCardsToLoad: mediaCards, messagesToLoad: messages })
+          room.
+            find( { numUsers: { $gt: 0 } } ).
+            sort({ numUsers: -1 }).
+            select({ _id: 0, roomName: 1, numUsers: 1 }).
+            exec(function(err, rooms) {
+              res.render('index', { roomToJoin: req.params.room, roomsToShow: rooms, imagesToLoad: images, mediaCardsToLoad: mediaCards, messagesToLoad: messages })
+            });
         });
       });
     });
@@ -297,8 +335,14 @@ conn.once("open", function(){
               if (err) return console.error(err);
               message.find({ room: req.params.room }).exec(function(err,messages) {
                 if (err) return console.error(err);
-                res.render('index', {
+                room.
+                find( { numUsers: { $gt: 0 } } ).
+                sort({ numUsers: -1 }).
+                select({ _id: 0, roomName: 1, numUsers: 1 }).
+                exec(function(err, rooms) {
+                  res.render('index', {
                   roomToJoin: req.params.room,
+                  roomsToShow: rooms,
                   imagesToLoad: images,
                   messagesToLoad: messages,
                   mediaCardsToLoad: mediaCards,
@@ -308,6 +352,7 @@ conn.once("open", function(){
                   specRotX: location.rotation.x,
                   specRotY: location.rotation.y,
                   specRotZ: location.rotation.z
+                  });
                 });
               });
             });
