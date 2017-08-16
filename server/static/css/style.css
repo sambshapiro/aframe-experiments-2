@@ -1,6 +1,10 @@
 /*Mobile*/
 @media (max-width: 1000px) {
 
+  #siteTitle {
+    font-size: 12pt;
+  }
+
   #menu_div{
     bottom: 7vh;
   }
@@ -31,6 +35,10 @@
 /*Desktop*/
 @media (min-width: 999px) {
 
+  #siteTitle {
+    font-size: 17pt;
+  }
+
   #menu_div{
     bottom: 0;
   }
@@ -56,6 +64,15 @@
     bottom: 15em;
   }
 
+}
+
+#siteTitle {
+  position: absolute;
+  z-index: 1;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  margin: 20px;
 }
 
 .menu_btn{

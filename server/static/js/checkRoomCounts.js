@@ -17,14 +17,28 @@ function checkRoomCount() {
 function toggleTheSidebar() {
   //if not closed, close it
   if ($( "#sidebar" ).data("closed") != true) {
-    $( "#openRoomsHeading").hide();
-    $( "#roomTable").hide();
-    $( "#sidebar" ).animate({
-      width: "3vw",
-    }, 1000, function() {
-      // Animation complete.
-      $( "#sidebar" ).data("closed",true);
-    });
+    //if on mobile
+    if ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      $( "#openRoomsHeading").hide();
+      $( "#roomTable").hide();
+      $( "#sidebar" ).animate({
+        width: "10vw",
+      }, 1000, function() {
+        // Animation complete.
+        $( "#sidebar" ).data("closed",true);
+      });
+    }
+    //if on desktop
+    else {
+      $( "#openRoomsHeading").hide();
+      $( "#roomTable").hide();
+      $( "#sidebar" ).animate({
+        width: "3vw",
+      }, 1000, function() {
+        // Animation complete.
+        $( "#sidebar" ).data("closed",true);
+      });
+    }
   }
   //if closed, open it
   else {
@@ -38,6 +52,7 @@ function toggleTheSidebar() {
         $( "#sidebar" ).data("closed",false);
       });
     }
+    //if on desktop
     else {
       $( "#sidebar" ).animate({
         width: "30vw",
