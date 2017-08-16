@@ -4,7 +4,7 @@ html
     title Adventure Corp
     meta(name='description', content='Adventure Corp')
     link(href='/css/style.css', rel='stylesheet', type='text/css', media='screen')
-    link(href='https://fonts.googleapis.com/css?family=Roboto', rel='stylesheet')
+    link(href='https://fonts.googleapis.com/css?family=Roboto:100', rel='stylesheet')
     script(src='/js/lib/jquery-3.2.1.min.js')
     script(src='/js/lib/aframe-0.6.1.min.js')
     script(src='/js/lib/socket.io-1.4.5.min.js')
@@ -56,6 +56,7 @@ html
       };
       NAF.schemas.add(avatarSchema);
   body
+    h1#siteTitle METAVERSE<br>NAVIGATOR
     div#sidebar
       h1(id="openRoomsHeading") Open Rooms
       img#toggleSidebar(src='/ui/icons/double-arrow.png', onclick='toggleTheSidebar()')
