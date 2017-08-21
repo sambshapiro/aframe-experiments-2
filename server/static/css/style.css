@@ -127,7 +127,7 @@ button.menu_btn{
   height: auto;
 }
 
-#link_input_div, #add_room_div{
+#link_input_div, #add_room_div, #mtl_input_div{
   margin: -50px 0 0 -150px;
   display:none;
   position:absolute;
@@ -149,11 +149,31 @@ p.p_input{
   color:black;
 }
 
+.link_input {
+  position: relative;
+  border: 0px solid #000;
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  cursor: pointer;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13pt;
+  color: black;
+  background-color:#50b3d0;
+  font-weight: 700;
+}
+
 .link_btns {
   position: relative;
   border: 0px solid #ccc;
-  display: inline-block;
-  width: 100%;
+  display: block;
+  margin-left: 75px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 150px;
+  -webkit-filter: drop-shadow(1px 1px 1px #888);
+  filter: drop-shadow(1px 1px 1px #444);
   cursor: pointer;
   text-align: center;
   font-family: 'Roboto', sans-serif;

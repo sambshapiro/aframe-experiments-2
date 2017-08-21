@@ -118,6 +118,16 @@ var imagesSchema = mongoose.Schema({
 });
 var image = mongoose.model('image', imagesSchema);
 
+var modelsSchema = mongoose.Schema({
+  room: String,
+  obj: String,
+  mtl:  String,
+  position: mongoose.Schema.Types.Mixed,
+  rotation: mongoose.Schema.Types.Mixed,
+  link: String
+});
+var model = mongoose.model('model', modelsSchema);
+
 var messageSchema = mongoose.Schema({
   room: String,
   message: String,
@@ -270,6 +280,24 @@ conn.once("open", function(){
     newImage.save(function (err, newImage) {
       if (err) return console.error(err);
       console.log("image successfully added to database");
+    });
+    res.end();
+  });
+
+  app.post("/room/:room/*/modelUpload", function(req, res){
+    var newModel = new model({ room: req.params.room, obj: req.body.obj, mtl: req.body.mtl, position: req.body.position, rotation: req.body.rotation, link: req.body.link});
+    newModel.save(function (err, newModel) {
+      if (err) return console.error(err);
+      console.log("model successfully added to database");
+    });
+    res.end();
+  });
+
+  app.post("/room/:room/modelUpload", function(req, res){
+    var newModel = new model({ room: req.params.room, obj: req.body.obj, mtl: req.body.mtl, position: req.body.position, rotation: req.body.rotation, link: req.body.link});
+    newModel.save(function (err, newModel) {
+      if (err) return console.error(err);
+      console.log("model successfully added to database");
     });
     res.end();
   });
