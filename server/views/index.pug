@@ -68,12 +68,16 @@ html
             th.numUsers #{room.numUsers}
     img#avatar-hud(src='/images/gradient.png')
     #link_input_div
-      p#media_input_p.p_input
-      input#appendedLink.link_btns(type='text', placeholder='Enter URL Here', name='Link', required='')
+      p#media_input_p.p_input Append URL to Media?
+      input#appendedLink.link_input(type='text', placeholder='Enter URL Here', name='Link', required='')
       button.link_btns(onclick='checkLink(mediaLoader)') Submit
       button.link_btns(onclick='mediaLoader("")') No Thanks
+    #mtl_input_div
+      p#mtl_input_p.p_input Add .mtl file to the model?
+      button.link_btns(onclick='mtlUploadPrompt()') Yes
+      button.link_btns(onclick='objUpload()') No, .obj only
     #add_room_div
-      input#enterRoomName.link_btns(type='text', placeholder='Room to Add', name='roomToAdd', required='')
+      input#enterRoomName.link_input(type='text', placeholder='Enter a new room name', name='roomToAdd', required='')
       button.link_btns(onclick='addRoom()') Add Room
     div.searchform.group
       input#search-box(type='search', placeholder='Paste a URL here or type a message to others')
@@ -84,6 +88,7 @@ html
       button#savelocationbutton.menu_btn.exp(name='Save Location', onclick='savePosition()')
         img.menu_icon(src='/ui/icons/location.png', style='filter: invert(100%);')
       input#media_input.upload(type='file', style='display:none', single='')
+      input#mtl_input.upload(type='file', style='display:none', single='')
       button#addmedia_btn.menu_btn.exp(name='Add Media', onclick='uploadMedia()')
         img.menu_icon(src='/ui/icons/addmedia.png')
       input#avatar_input.upload(type='file', style='display:none', single='')
@@ -222,6 +227,12 @@ html
         console.log("DATA RECEIVED", senderRtcId, dataType, data);
         var image = JSON.parse(data);
         addImageToScene(image.src, image.position, image.rotation, image.link, image.gif);
+      };
+      NAF.connection.subscribeToDataChannel('modelPlaced', modelCallback);
+      function modelCallback(senderRtcId, dataType, data) {
+        console.log("DATA RECEIVED", senderRtcId, dataType, data);
+        var model = JSON.parse(data);
+        addModelToScene(model.obj, model.mtl, model.position, model.rotation, model.link);
       };
       NAF.connection.subscribeToDataChannel('mediaCardPlaced', mediaCardCallback);
       function mediaCardCallback(senderRtcId, dataType, data) {

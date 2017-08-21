@@ -1,15 +1,36 @@
 var reader = new FileReader();
+var objData;
+var objFile;
+var mtlFile;
 
 $(document).ready(function(){
   document.getElementById("media_input").addEventListener("change", function() {
     $("#link_input_div").show();
-    $('#media_input_p').text("Append URL to Media?");
+  });
+
+  document.getElementById("mtl_input").addEventListener("change", function() {
+    var file = document.getElementById("mtl_input").files[0];
+    var extension = file.name.split('.').pop().toLowerCase();  //file extension from input file
+    reader.onload = function() {
+      if (extension === 'mtl') {
+        objData.mtl = reader.result;
+        mtlFile = file;
+      };
+      objUpload();
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    };
   });
 
 });
 
 function uploadMedia() {
   $("#media_input").click();
+}
+
+function mtlUploadPrompt() {
+  $("#mtl_input").click();
 }
 
 function useSiteContent(link) {
@@ -112,17 +133,32 @@ function mediaLoader(link) {
       addImageToScene(reader.result, position, rotation, link, filetype == 'image/gif');
 
       var data = { src: reader.result, position: position, rotation: rotation, link: link, gif: filetype == 'image/gif'};
-      console.log("broadcasting data");
+      //console.log("broadcasting data");
       //adds image to scene for others in room NOW
       NAF.connection.broadcastDataGuaranteed('imagePlaced', JSON.stringify(data));
 
       //adds image to scene for others in room LATER
-      //upload to s3, then broadcast in realtime and save to database for later
       awsGetSignedRequest(file, data);
     }
 
+    //if not an image/gif
     else {
-
+      console.log("not image/gif");
+      var extension = file.name.split('.').pop().toLowerCase();  //file extension from input file
+      console.log("extension " + extension);
+      if (extension === 'obj') {
+        //console.log("extension === obj");
+        //console.log("reader.result " + reader.result);
+        $("#mtl_input_div").show();
+        objData = {
+          obj: reader.result,
+          position: position,
+          rotation: rotation,
+          link: link
+        };
+        objFile = file;
+        //handle the actual upload after mtl decision
+      }
 
     }
 
@@ -134,16 +170,38 @@ function mediaLoader(link) {
   }
 }
 
-function awsGetSignedRequest(file, data){
+function objUpload() {
+
+  $("#mtl_input_div").hide();
+
+  addModelToScene(objData.obj, objData.mtl, objData.position, objData.rotation, objData.link);
+
+  var data = { obj: objData.obj, mtl: objData.mtl, position: objData.position, rotation: objData.rotation, link: objData.link};
+
+  //adds model to scene for others in room NOW
+  NAF.connection.broadcastDataGuaranteed('modelPlaced', JSON.stringify(data));
+
+  //adds model to scene for others in room LATER
+  awsGetSignedRequest(objFile, null, "obj");
+  if (objData.mtl != null) awsGetSignedRequest(mtlFile, null, "mtl");
+}
+
+function awsGetSignedRequest(file, data, modelType){
   const xhr = new XMLHttpRequest();
   //TODO add random unique characters after file name to prevent overwriting
   var name = (file.name).replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  xhr.open('GET', `/sign-s3?file-name=${name}&file-type=${file.type}`);
+  console.log("name: " + name);
+  if (modelType != null) {
+    xhr.open('GET', `/sign-s3?file-name=${name}`); 
+  }
+  else {
+    xhr.open('GET', `/sign-s3?file-name=${name}&file-type=${file.type}`); 
+  }
   xhr.onreadystatechange = () => {
     if(xhr.readyState === 4){
       if(xhr.status === 200){
         const response = JSON.parse(xhr.responseText);
-        awsUploadFile(file, response.signedRequest, response.url, data);
+        awsUploadFile(file, response.signedRequest, response.url, data, modelType);
       }
       else{
         alert('Could not upload file (could not get signed URL).');
@@ -155,14 +213,26 @@ function awsGetSignedRequest(file, data){
 
 //TODO add a loading indicator to be displayed between selecting a file and the upload being completed
 
-function awsUploadFile(file, signedRequest, url, data){
+function awsUploadFile(file, signedRequest, url, data, modelType){
   const xhr = new XMLHttpRequest();
   xhr.open('PUT', signedRequest);
   xhr.onreadystatechange = () => {
     if(xhr.readyState === 4){
       if(xhr.status === 200){
-        data.src = url;
-        addImageToDatabase(data);
+        if (modelType === "obj") {
+          objData.obj = url;
+          if (objData.mtl == null) {
+            addModelToDatabase();
+          }
+        }
+        else if (modelType === "mtl") {
+          objData.mtl = url;
+          addModelToDatabase();
+        }
+        else {
+          data.src = url;
+          addImageToDatabase(data);
+        }
       }
       else{
         alert('Could not upload file.');
@@ -178,6 +248,18 @@ function addImageToDatabase(data) {
     data: JSON.stringify(data),
     contentType: 'application/json',
     url: location.protocol + '//' + location.host + location.pathname + '/imageUpload',
+    success: function(data) {
+      console.log('success');
+    }
+  });
+}
+
+function addModelToDatabase() {
+  $.ajax({
+    type: 'POST',
+    data: JSON.stringify(objData),
+    contentType: 'application/json',
+    url: location.protocol + '//' + location.host + location.pathname + '/modelUpload',
     success: function(data) {
       console.log('success');
     }

@@ -32,6 +32,21 @@ function addImageToScene(src, position, rotation, link, gif) {
   }
 }
 
+function addModelToScene(obj, mtl, position, rotation, link) {
+  var entityEl = document.createElement('a-entity');
+  var objstring = 'obj: url(' + obj + ');';
+  if (mtl != null) {
+    var mtlstring = ' mtl: url(' + mtl + ');';
+    objstring = objstring.concat(mtlstring);
+  }
+  entityEl.setAttribute('obj-model',objstring);
+  entityEl.setAttribute('visible','true');
+  entityEl.setAttribute('position',position);
+  entityEl.setAttribute('rotation',rotation);
+  entityEl.setAttribute('mylink', 'link', link);
+  document.querySelector('a-scene').appendChild(entityEl);
+}
+
 function addScrapedContent(title, description, src, link, position, rotation) {
   //src validation just to check if there's an image; if not, don't bother posting media card
   if (validateLink(src)<2) {
