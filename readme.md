@@ -1,7 +1,3 @@
-<img src="server/static/images/Adventure_Corporation.png" width="300">
+Metaverse navigator built by Sam Shapiro
 
-
-Adventure Corp
-=======
-
-Need to fill this in...
+Forked from Hayden Lee's networked-aframe: https://haydenlee.io/networked-aframe/
